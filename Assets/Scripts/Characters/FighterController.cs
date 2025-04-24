@@ -1,31 +1,29 @@
-﻿using UnityEngine;
+﻿using System.Globalization;
+using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.InputSystem.XInput;
 
 /// <summary>
-/// Handles input-driven attack logic for a FighterBase character.
+/// Handles input-driven attack logic for a FighterBase character, but only for the owning player.
 /// </summary>
-public class FighterController : MonoBehaviour
+public class FighterController : NetworkBehaviour
 {
     private FighterBase fighter;
-    // private TEMP input; | WIP AV KALLE
 
     private void Start()
     {
         fighter = GetComponent<FighterBase>();
-        // input = GetComponent<TEMP>(); | WIP AV KALLE
 
         if (fighter == null)
             Debug.LogError("No FighterBase found on GameObject!");
-        /*
-        if (input == null)
-            Debug.LogError("No IInputController found on GameObject!");
-        */
+
     }
 
     private void Update()
     {
-        /*
-        if (input != null && input.IsAttacking())
+        if (!IsOwner) return; // Only allow local input on owned object
+        
+        if (Input.GetKeyDown(KeyCode.E))
         {
             var target = FindOpponent();
             if (target != null)
@@ -33,7 +31,7 @@ public class FighterController : MonoBehaviour
                 fighter.Attack(target);
             }
         }
-        */
+        
     }
 
     private FighterBase FindOpponent()

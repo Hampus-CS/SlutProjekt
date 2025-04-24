@@ -11,6 +11,7 @@ public abstract class FighterBase : MonoBehaviour
     public int baseAttackPower = 10;
 
     [HideInInspector] public int currentHealth;
+    [HideInInspector] public event System.Action<int> OnDamaged;
 
     protected virtual void Start()
     {
@@ -22,6 +23,8 @@ public abstract class FighterBase : MonoBehaviour
     public virtual void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        OnDamaged?.Invoke(damage);
+
         Debug.Log($"{fighterName} took {damage} damage. Remaining HP: {currentHealth}");
 
         if (currentHealth <= 0)
