@@ -1,38 +1,47 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Simple network launcher for testing multiplayer host/client + join/leave logging.
 /// </summary>
 public class NetworkLauncher : MonoBehaviour
 {
-    private void OnGUI()
-    {
-        if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-        {
-            GUILayout.BeginArea(new Rect(10, 10, 200, 100), "Start Network", GUI.skin.window);
-            if (GUILayout.Button("Start Host"))
-            {
-                NetworkManager.Singleton.StartHost();
-            }
-            if (GUILayout.Button("Start Client"))
-            {
-                NetworkManager.Singleton.StartClient();
-            }
-            GUILayout.EndArea();
-        }
-    }
+    [Header("Buttons")]
+    public Button hostButton;
+    public Button clientButton;
 
-    private void OnEnable()
+    private void Start()
     {
+        // Hook up button listeners
+        hostButton.onClick.AddListener(StartAsHost);
+        clientButton.onClick.AddListener(StartAsClient);
+
+        // Join/leave log callbacks
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
+        // Unhook listeners to avoid memory leaks
+        hostButton.onClick.RemoveListener(StartAsHost);
+        clientButton.onClick.RemoveListener(StartAsClient);
+
         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+    }
+
+    public void StartAsHost()
+    {
+        NetworkManager.Singleton.StartHost();
+        Debug.Log("[NetworkLauncherUI] Started as Host");
+    }
+
+    public void StartAsClient()
+    {
+        NetworkManager.Singleton.StartClient();
+        Debug.Log("[NetworkLauncherUI] Started as Client");
     }
 
     private void OnClientConnected(ulong clientId)
