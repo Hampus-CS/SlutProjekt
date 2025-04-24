@@ -50,6 +50,7 @@ public class DevMenu : MonoBehaviour
 
         if (GUILayout.Button("Heal Player 1")) player1.currentHealth = player1.maxHealth;
         if (GUILayout.Button("Heal Player 2")) player2.currentHealth = player2.maxHealth;
+        if (GUILayout.Button("Kill Player 1")) player1.TakeDamage(9999);
         if (GUILayout.Button("Kill Player 2")) player2.TakeDamage(9999);
         if (GUILayout.Button("Log Player Scores"))
         {
