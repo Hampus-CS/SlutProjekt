@@ -4,14 +4,18 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Linq;
 using System.Collections;
+using Unity.Netcode.Transports.UTP;
 
 /// <summary>
 /// Starts multiplayer session, loads the game scene,
 /// and spawns players at fixed positions (SpawnPointA and SpawnPointB).
 /// Only 2 players are allowed.
 /// </summary>
+[RequireComponent(typeof(LanDiscovery))]
 public class NetworkLauncher : MonoBehaviour
 {
+    private LanDiscovery lanDiscovery;
+    
     [Header("Buttons")]
     public Button hostButton;
     public Button clientButton;
@@ -19,6 +23,11 @@ public class NetworkLauncher : MonoBehaviour
     [Header("Scene")]
     public string gameSceneName = "HCS"; // TODO: Change this game scene name at a later date instead of the testing scene!
 
+    private void Awake()
+    {
+        lanDiscovery = GetComponent<LanDiscovery>();
+    }
+    
     private void Start()
     {
         // Hook up button listeners
@@ -53,7 +62,9 @@ public class NetworkLauncher : MonoBehaviour
     private IEnumerator DelayedHostStart()
     {
         yield return null; // Wait a frame to let NetworkManager initialize
-
+        
+        lanDiscovery.StartListening(null); // Start listening for pings from clients
+        
         if (NetworkManager.Singleton == null)
         {
             Debug.LogError("[NetworkLauncher] NetworkManager.Singleton is null!");
@@ -74,8 +85,18 @@ public class NetworkLauncher : MonoBehaviour
     public void StartAsClient()
     {
         Debug.Log("[NetworkLauncherUI] Starting as Client...");
-        // Add fade or something simillar
-        StartCoroutine(DelayedClientStart());
+        
+        lanDiscovery.StartListening(ip =>
+        {
+            Debug.Log($"[LAN] Discovered host at {ip}");
+
+            var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            transport.SetConnectionData(ip, 7777); // default NGO port
+            // Add fade or something simillar
+            StartCoroutine(DelayedClientStart());
+        });
+
+        lanDiscovery.SendDiscoveryRequest();
     }
 
     private IEnumerator DelayedClientStart()
