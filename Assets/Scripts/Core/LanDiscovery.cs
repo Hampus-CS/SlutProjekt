@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System;
+using System.Threading.Tasks;
 
 public class LanDiscovery : MonoBehaviour
 {
@@ -12,12 +13,15 @@ public class LanDiscovery : MonoBehaviour
 
     public async void StartListening(System.Action<string> onDiscovered)
     {
+        
         if (isListening) return;
         isListening = true;
 
         try
         {
-            listener = new UdpClient(discoveryPort);
+            listener = new UdpClient();
+            listener.EnableBroadcast = true;
+            listener.Client.Bind(new IPEndPoint(IPAddress.Any, discoveryPort));
             Debug.Log($"[LANDiscovery] Listening on UDP port {discoveryPort}");
 
             while (true)
@@ -30,14 +34,21 @@ public class LanDiscovery : MonoBehaviour
                 }
                 catch (ObjectDisposedException)
                 {
-                    // Listener was closed, exit the loop
                     Debug.Log("[LANDiscovery] Listener closed.");
                     break;
                 }
                 catch (SocketException e)
                 {
-                    Debug.LogError($"[LANDiscovery] Socket error: {e.Message}");
-                    break;
+                    if (e.SocketErrorCode == SocketError.ConnectionReset)
+                    {
+                        Debug.LogWarning("[LANDiscovery] Host forcibly closed discovery socket. Ignoring...");
+                        break;
+                    }
+                    else
+                    {
+                        Debug.LogError($"[LANDiscovery] Socket error: {e.Message}");
+                        break;
+                    }
                 }
 
                 string message = Encoding.UTF8.GetString(result.Buffer);
@@ -60,7 +71,7 @@ public class LanDiscovery : MonoBehaviour
 
                         onDiscovered?.Invoke(hostIp);
 
-                        // ✅ Stop listening after discovering the host
+                        await Task.Delay(250); // small grace period
                         StopListening();
                         break;
                     }
