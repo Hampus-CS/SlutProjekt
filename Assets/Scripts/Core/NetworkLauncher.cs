@@ -63,6 +63,9 @@ public class NetworkLauncher : MonoBehaviour
     {
         yield return null; // Wait a frame to let NetworkManager initialize
         
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        transport.SetConnectionData("0.0.0.0", 7777);
+        
         lanDiscovery.StartListening(null); // Start listening for pings from clients
         
         if (NetworkManager.Singleton == null)
