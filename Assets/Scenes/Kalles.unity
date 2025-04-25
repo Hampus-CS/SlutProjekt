@@ -814,11 +814,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  acceleration: 15
+  deceleration: 20
+  velocityPower: 0.95
   jumpForce: 5
   dashSpeed: 10
   dashDuration: 0.2
-  jumpCooldown: 0.2
-  stopDelay: 0.5
+  stopThreshold: 0.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

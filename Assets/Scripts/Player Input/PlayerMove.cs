@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -5,15 +6,15 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class PlayerMove : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float jumpForce = 5f;
-    public float dashSpeed = 10f;
+    public float acceleration = 60f;
+    public float deceleration = 40f;
+    public float velocityPower = 0.95f;
+    public float jumpForce = 8f;
+    public float dashSpeed = 12f;
     public float dashDuration = 0.2f;
-    public float jumpCooldown = 0.2f;
-    public float stopDelay = 0.5f;
-
-    private Vector2 moveDirection = Vector2.zero;
+    public float stopThreshold = 0.05f;
 
     [Header("Ground Check")]
     public LayerMask groundLayer;
@@ -21,101 +22,124 @@ public class PlayerMove : MonoBehaviour
     public float groundCheckRadius = 0.2f;
 
     private Rigidbody2D rb;
-    private bool IsGrounded;
-    private bool IsMoving;
-    private bool isDashing = false;
-    private float dashTimer = 0f;
+    private bool isGrounded;
+    private bool isDashing;
+    private float dashTimer;
 
-    private float stopTimer = 0f;
+    private bool movingLeft;
+    private bool movingRight;
+
+    private Vector2 moveDirection = Vector2.zero;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        // Ground check
-        Vector2 boxSize = new Vector2(0.2f, 0.05f); // width, height
-        IsGrounded = Physics2D.OverlapBox(groundCheck.position, boxSize, 0f, groundLayer);
+        if (isDashing) return;
 
-        // Movement input
-        bool movingLeft = Input.GetKey(KeyCode.A);
-        bool movingRight = Input.GetKey(KeyCode.D);
-        bool movingBoth = movingLeft && movingRight;
+        movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
 
-        // Dash (only while moving)
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && (movingLeft || movingRight))
+        if (movingLeft && movingRight)
         {
-            if (movingLeft)
-            {
-                moveDirection = Vector2.left;
-            }
-            else
-            {
-                moveDirection = Vector2.right;
-            }
-            // Apply dash force
-            rb.linearVelocity = new Vector2(moveDirection.x * dashSpeed, rb.linearVelocity.y);
-            isDashing = true;
-            dashTimer = dashDuration;
-            return; // Skip rest of movement logic
+            moveDirection = Vector2.zero; // Stop if both keys are pressed
+        }
+        else if (movingLeft)
+        {
+            moveDirection = Vector2.left; // Move left
+        }
+        else if (movingRight)
+        {
+            moveDirection = Vector2.right; // Move right
+        }
+        else
+        {
+            moveDirection = Vector2.zero; // No movement if neither is pressed
         }
 
-        // Dash timer
-        if (isDashing)
-        {
-            dashTimer -= Time.fixedDeltaTime;
-            if (dashTimer <= 0f)
-            {
-                isDashing = false;
-            }
-            else
-            {
-                return; // Skip movement logic while dashing
-            }
-        }
-
-        // Jump
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded)
+        // Jump (only if grounded)
+        if (Input.GetKeyDown(KeyCode.W) && isGrounded || Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        } 
+
+        // Dash (only if there is movement direction)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && moveDirection != Vector2.zero)
+        {
+            StartDash();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        if (isDashing)
+        {
+            HandleDash();
+            return;
         }
 
-        if (movingLeft && !movingBoth)
-        {
-            moveDirection = Vector2.left;
-            rb.linearVelocity = new Vector2(-moveSpeed, rb.linearVelocity.y);
-            IsMoving = true;
-            stopTimer = 0f;
-        }
-        else if (movingRight && !movingBoth)
-        {
-            moveDirection = Vector2.right;
-            rb.linearVelocity = new Vector2(moveSpeed, rb.linearVelocity.y);
-            IsMoving = true;
-            stopTimer = 0f;
-        }
-        else if (IsMoving)
-        {
-            // Fade out movement when not pressing A or D
-            stopTimer += Time.fixedDeltaTime;
-            float t = stopTimer / stopDelay;
-            float fadedX = Mathf.Lerp(rb.linearVelocity.x, 0f, t);
-            rb.linearVelocity = new Vector2(fadedX, rb.linearVelocity.y);
+        HandleMovement();
+    }
 
-            if (t >= 1f)
-            {
-                IsMoving = false;
-                stopTimer = 0f;
-            }
+    private void HandleMovement()
+    {
+        // Calculate target speed based on move direction and speed
+        float targetSpeed = moveDirection.x * moveSpeed;
+        float speedDiff = targetSpeed - rb.linearVelocity.x;
+
+        // Use acceleration if moving, deceleration if stopping
+        float accelRate;
+        if (moveDirection != Vector2.zero)
+        {
+            accelRate = acceleration; // Accelerate if moving
+        }
+        else
+        {
+            accelRate = deceleration; // Decelerate if stopping
+        }
+
+        // Smooth movement with a velocity curve
+        float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
+
+        // Apply movement to the Rigidbody2D
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y);
+
+        // If velocity is close to zero and no movement direction, snap to 0 (stop)
+        if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        }
+    }
+
+
+    private void StartDash()
+    {
+        isDashing = true;
+        dashTimer = dashDuration;
+
+        rb.linearVelocity = new Vector2(moveDirection.x * dashSpeed, 0f);
+    }
+
+    private void HandleDash()
+    {
+        dashTimer -= Time.fixedDeltaTime;
+        if (dashTimer <= 0f)
+        {
+            isDashing = false;
         }
     }
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Vector2 boxSize = new Vector2(0.2f, 0.05f);
-        Gizmos.DrawWireCube(groundCheck.position, boxSize);
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
     }
 }
