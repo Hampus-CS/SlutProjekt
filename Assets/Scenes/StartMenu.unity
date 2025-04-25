@@ -735,6 +735,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3706251308421598136, guid: 72e3263912dcdfd4faa5021dddd4584f, type: 3}
+      propertyPath: ConnectionData.ServerListenAddress
+      value: 0.0.0.0
+      objectReference: {fileID: 0}
     - target: {fileID: 6666201407210160290, guid: 72e3263912dcdfd4faa5021dddd4584f, type: 3}
       propertyPath: NetworkConfig.ForceSamePrefabs
       value: 1
