@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using System;
 
 public class LanDiscovery : MonoBehaviour
 {
@@ -15,24 +15,61 @@ public class LanDiscovery : MonoBehaviour
         if (isListening) return;
         isListening = true;
 
-        listener = new UdpClient(discoveryPort);
-        while (true)
+        try
         {
-            var result = await listener.ReceiveAsync();
-            string message = Encoding.UTF8.GetString(result.Buffer);
+            listener = new UdpClient(discoveryPort);
+            Debug.Log($"[LANDiscovery] Listening on UDP port {discoveryPort}");
 
-            if (message == "DISCOVER_HOST")
+            while (true)
             {
-                string response = "HOST_HERE";
-                byte[] data = Encoding.UTF8.GetBytes(response);
-                await listener.SendAsync(data, data.Length, result.RemoteEndPoint);
-                Debug.Log($"[LANDiscovery] Replied to {result.RemoteEndPoint}");
+                UdpReceiveResult result;
+
+                try
+                {
+                    result = await listener.ReceiveAsync();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Listener was closed, exit the loop
+                    Debug.Log("[LANDiscovery] Listener closed.");
+                    break;
+                }
+                catch (SocketException e)
+                {
+                    Debug.LogError($"[LANDiscovery] Socket error: {e.Message}");
+                    break;
+                }
+
+                string message = Encoding.UTF8.GetString(result.Buffer);
+
+                if (message == "DISCOVER_HOST")
+                {
+                    string response = "HOST_HERE";
+                    byte[] data = Encoding.UTF8.GetBytes(response);
+
+                    await listener.SendAsync(data, data.Length, result.RemoteEndPoint);
+                    Debug.Log($"[LANDiscovery] Replied to {result.RemoteEndPoint}");
+                }
+                else if (message.StartsWith("HOST_HERE"))
+                {
+                    string hostIp = result.RemoteEndPoint.Address.ToString();
+
+                    if (hostIp != "127.0.0.1") // prevent echoing own reply
+                    {
+                        Debug.Log($"[LANDiscovery] Discovered host at {hostIp}");
+
+                        onDiscovered?.Invoke(hostIp);
+
+                        // ✅ Stop listening after discovering the host
+                        StopListening();
+                        break;
+                    }
+                }
             }
-            else if (message.StartsWith("HOST_HERE"))
-            {
-                Debug.Log($"[LANDiscovery] Received host response from {result.RemoteEndPoint}");
-                onDiscovered?.Invoke(result.RemoteEndPoint.Address.ToString());
-            }
+        }
+        catch (SocketException ex)
+        {
+            Debug.LogError($"[LANDiscovery] Failed to bind to port {discoveryPort}: {ex.Message}");
         }
     }
 
@@ -44,13 +81,31 @@ public class LanDiscovery : MonoBehaviour
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, discoveryPort);
 
             byte[] data = Encoding.UTF8.GetBytes("DISCOVER_HOST");
-            await sender.SendAsync(data, data.Length, endPoint);
-            Debug.Log("[LANDiscovery] Broadcasted discovery message");
+            try
+            {
+                await sender.SendAsync(data, data.Length, endPoint);
+                Debug.Log("[LANDiscovery] Broadcasted discovery message");
+            }
+            catch (SocketException ex)
+            {
+                Debug.LogError($"[LANDiscovery] Broadcast failed: {ex.Message}");
+            }
         }
+    }
+    
+    public void StopListening()
+    {
+        if (listener != null)
+        {
+            listener.Close();
+            listener = null;
+        }
+        isListening = false;
+        Debug.Log("[LANDiscovery] Discovery stopped.");
     }
 
     private void OnApplicationQuit()
     {
-        listener?.Dispose();
+        StopListening();
     }
 }
