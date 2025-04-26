@@ -1,4 +1,3 @@
-using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -30,10 +29,12 @@ public class PlayerMove : MonoBehaviour
     private bool movingRight;
 
     private Vector2 moveDirection = Vector2.zero;
+    private SpriteRenderer spriteRenderer;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -43,17 +44,18 @@ public class PlayerMove : MonoBehaviour
         movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
 
+        // Handle movement direction
         if (movingLeft && movingRight)
         {
             moveDirection = Vector2.zero; // Stop if both keys are pressed
         }
         else if (movingLeft)
         {
-            moveDirection = Vector2.left; // Move left
+            moveDirection = Vector2.left;
         }
         else if (movingRight)
         {
-            moveDirection = Vector2.right; // Move right
+            moveDirection = Vector2.right;
         }
         else
         {
@@ -61,15 +63,25 @@ public class PlayerMove : MonoBehaviour
         }
 
         // Jump (only if grounded)
-        if (Input.GetKeyDown(KeyCode.W) && isGrounded || Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
+        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        } 
+        }
 
         // Dash (only if there is movement direction)
         if (Input.GetKeyDown(KeyCode.LeftShift) && moveDirection != Vector2.zero)
         {
             StartDash();
+        }
+
+        
+        if (movingLeft)
+        {
+            FlipPlayer(true);
+        }
+        else if (movingRight)
+        {
+            FlipPlayer(false);
         }
     }
 
@@ -93,29 +105,20 @@ public class PlayerMove : MonoBehaviour
         float speedDiff = targetSpeed - rb.linearVelocity.x;
 
         // Use acceleration if moving, deceleration if stopping
-        float accelRate;
-        if (moveDirection != Vector2.zero)
-        {
-            accelRate = acceleration; // Accelerate if moving
-        }
-        else
-        {
-            accelRate = deceleration; // Decelerate if stopping
-        }
+        float accelRate = moveDirection != Vector2.zero ? acceleration : deceleration;
 
         // Smooth movement with a velocity curve
         float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
 
         // Apply movement to the Rigidbody2D
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y); 
 
         // If velocity is close to zero and no movement direction, snap to 0 (stop)
-        if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero)
+        if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero) 
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         }
     }
-
 
     private void StartDash()
     {
@@ -132,6 +135,23 @@ public class PlayerMove : MonoBehaviour
         {
             isDashing = false;
         }
+    }
+
+    private void FlipPlayer(bool flipLeft)
+    {
+        // Flip the entire player's transform based on movement direction
+        Vector3 scale = transform.localScale;
+
+        if (flipLeft)
+        {
+            scale.x = -Mathf.Abs(scale.x); // Flip to the left
+        }
+        else
+        {
+            scale.x = Mathf.Abs(scale.x);  // Flip to the right
+        }
+
+        transform.localScale = scale;
     }
 
     private void OnDrawGizmosSelected()

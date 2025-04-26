@@ -22,7 +22,7 @@ public class FighterController : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return; // Only allow local input on owned object
-        
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             var target = FindOpponent();
@@ -31,7 +31,7 @@ public class FighterController : NetworkBehaviour
                 fighter.Attack(target);
             }
         }
-        
+
     }
 
     private FighterBase FindOpponent()
