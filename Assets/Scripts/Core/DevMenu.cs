@@ -20,8 +20,8 @@ public class DevMenu : MonoBehaviour
 
     void Start()
     {
-        if (player1 != null) player1.OnDamaged += (dmg) => LogDamage(player1.fighterName, dmg);
-        if (player2 != null) player2.OnDamaged += (dmg) => LogDamage(player2.fighterName, dmg);
+        //if (player1 != null) player1.OnDamaged += (dmg) => LogDamage(player1.fighterName, dmg);
+        //if (player2 != null) player2.OnDamaged += (dmg) => LogDamage(player2.fighterName, dmg);
     }
 
     void Update()
