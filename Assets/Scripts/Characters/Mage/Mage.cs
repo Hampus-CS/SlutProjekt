@@ -92,13 +92,14 @@ public class Mage : FighterBase
             fireball.transform.localScale = scale;
         }
     }
-
+    
     public override void Attack(FighterBase opponent)
     {
         int damage = baseAttackPower + 2; // Less than Warrior but maybe could be a ranged attack later or something like that. But for now 
         Debug.Log($"{fighterName} (Mage) casts a fireball at {opponent.fighterName}, dealing {damage} magic damage!");
         opponent.TakeDamage(damage);
     }
+    
 }
 
 // Thoughts about what we can add if we want/have time: Mana systems, Spell cooldowns, AOE or ranged targeting, Status effects (like burn, freeze, etc.)
