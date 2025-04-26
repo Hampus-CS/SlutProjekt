@@ -1,9 +1,10 @@
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
 [RequireComponent(typeof(SpriteRenderer))]
-public class PlayerMove : MonoBehaviour
+public class PlayerMove : NetworkBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
@@ -39,6 +40,8 @@ public class PlayerMove : MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner) return; // Prevent non-owners from moving
+        
         if (isDashing) return;
 
         movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
@@ -87,6 +90,8 @@ public class PlayerMove : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsOwner) return; // Prevent non-owners from moving
+        
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         if (isDashing)
