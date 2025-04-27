@@ -1086,6 +1086,7 @@ GameObject:
   - component: {fileID: 997898202}
   - component: {fileID: 997898206}
   - component: {fileID: 997898205}
+  - component: {fileID: 997898209}
   - component: {fileID: 997898207}
   - component: {fileID: 997898208}
   m_Layer: 0
@@ -1244,6 +1245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d71e434d3d6ea3c49a1773d6e2c5c735, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
   acceleration: 15
   deceleration: 20
@@ -1281,6 +1283,31 @@ MonoBehaviour:
   fireballCost: 20
   manaRegenerationRate: 5
   manaText: {fileID: 511268244}
+--- !u!114 &997898209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 997898201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1475932592
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &1014002092
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,10 +3,9 @@ using System.Collections;
 
 public class Fireball : MonoBehaviour
 {
-    public int impactDamage = 10;
-    public int totalBurnDamage = 10;
-    public float burnDuration = 5f;
-    public float burnTickInterval = 1f;
+    private int impactDamage = 10;
+    private int totalBurnDamage = 10;
+    private float burnDuration = 5f;
 
     private void Start()
     {
@@ -20,7 +19,7 @@ public class Fireball : MonoBehaviour
         {
             target.TakeDamage(impactDamage);
 
-            target.ApplyBurn(totalBurnDamage, burnDuration, burnTickInterval);
+            target.ApplyBurn(totalBurnDamage, burnDuration);
 
             Destroy(gameObject);
         }
