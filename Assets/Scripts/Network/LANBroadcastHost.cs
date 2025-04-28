@@ -14,7 +14,7 @@ public class LANBroadcastHost : MonoBehaviour
 {
     [Header("Broadcast Settings")]
     [SerializeField] private int broadcastPort = 47777;
-    
+
     private UdpClient udpClient;
     [SerializeField] private float timer;
     [SerializeField] private float elapsedTime;
@@ -22,19 +22,19 @@ public class LANBroadcastHost : MonoBehaviour
 
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI broadcastStatusText;
-    
+
     [Header("Pulse Settings")]
     [SerializeField] private float pulseSpeed = 2f; // How fast it pulses
     [SerializeField] private float pulseStrength = 2f; // How much the font size changes
 
     private float baseFontSize; // To remember original font size
-    
+
     private void Start()
     {
         udpClient = new UdpClient();
         udpClient.EnableBroadcast = true;
         Debug.Log("[LANBroadcastHost] Broadcast started.");
-        
+
         if (broadcastStatusText != null)
             baseFontSize = broadcastStatusText.fontSize;
     }
@@ -57,18 +57,18 @@ public class LANBroadcastHost : MonoBehaviour
 
         elapsedTime += Time.deltaTime;
         timer += Time.deltaTime;
-        
+
         UpdateBroadcastInterval();
         UpdateBroadcastStatusText();
         UpdatePulseEffect();
-        
+
         if (timer >= currentInterval)
         {
             timer = 0f;
             BroadcastHostInfo();
         }
     }
-    
+
     private void UpdateBroadcastInterval()
     {
         if (elapsedTime < 30f)
@@ -134,7 +134,7 @@ public class LANBroadcastHost : MonoBehaviour
         }
         return new IPAddress(broadcastBytes);
     }
-    
+
     private void StopBroadcasting()
     {
         if (udpClient != null)
@@ -145,7 +145,7 @@ public class LANBroadcastHost : MonoBehaviour
 
         enabled = false; // Disable Update loop
     }
-    
+
     private string GetLocalIPAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -166,7 +166,7 @@ public class LANBroadcastHost : MonoBehaviour
     {
         StopBroadcasting();
     }
-    
+
     private void UpdateBroadcastStatusText()
     {
         if (broadcastStatusText != null)
@@ -192,7 +192,7 @@ public class LANBroadcastHost : MonoBehaviour
             broadcastStatusText.text = $"{colorTag}Elapsed: {elapsedSeconds}s\nBroadcast every: {intervalSeconds}s</color>";
         }
     }
-    
+
     private void UpdatePulseEffect()
     {
         if (broadcastStatusText != null)
@@ -201,6 +201,4 @@ public class LANBroadcastHost : MonoBehaviour
             broadcastStatusText.fontSize = baseFontSize + pulse;
         }
     }
-
-    
 }

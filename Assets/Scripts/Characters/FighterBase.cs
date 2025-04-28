@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
-using TMPro; // If you're using TextMeshPro for HP display
+using TMPro;
 
-/// <summary>
-/// Base class for all fighters (Mage, Warrior, etc.) — handles health, damage, and status effects.
-/// </summary>
 public abstract class FighterBase : MonoBehaviour
 {
+    [Header("Base Stats")]
     public string fighterName = "Fighter";
     public int baseAttackPower = 10;
     public int currentHealth;
@@ -14,23 +12,36 @@ public abstract class FighterBase : MonoBehaviour
 
     [Header("UI Elements")]
     public TextMeshProUGUI hpText;
+    public TextMeshProUGUI manaText;
+
+    [Header("Mana System")]
+    public float maxMana = 100f;
+    public float currentMana;
+    public float manaRegenerationRate = 5f;
 
     // Status effect management
     private bool isBurning = false;
+    public bool isStunned = false;
     private Coroutine burnCoroutine;
 
-    private void Start()
+    protected virtual void Start()
     {
         currentHealth = maxHealth;
+        currentMana = maxMana;
         UpdateHPText();
+        UpdateManaText();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
+        RegenerateMana();
+
         if (hpText != null)
         {
             hpText.text = "HP: " + currentHealth;
         }
+
+        UpdateManaText();
     }
 
     public virtual void TakeDamage(int amount)
@@ -48,7 +59,6 @@ public abstract class FighterBase : MonoBehaviour
 
     public abstract void Attack(FighterBase opponent);
 
-
     protected virtual void Die()
     {
         Debug.Log($"{fighterName} has died.");
@@ -63,7 +73,39 @@ public abstract class FighterBase : MonoBehaviour
         }
     }
 
-    // Apply a burn effect to the target
+    private void UpdateManaText()
+    {
+        if (manaText != null)
+        {
+            manaText.text = "Mana: " + Mathf.FloorToInt(currentMana).ToString();
+        }
+    }
+
+    private void RegenerateMana()
+    {
+        if (currentMana < maxMana)
+        {
+            currentMana += manaRegenerationRate * Time.deltaTime;
+            if (currentMana > maxMana) currentMana = maxMana;
+        }
+    }
+
+    public bool HasEnoughMana(int amount)
+    {
+        return currentMana >= amount;
+    }
+
+    public void SpendMana(int amount)
+    {
+        currentMana -= amount;
+
+        if (currentMana < 0)
+        {
+            currentMana = 0;
+        }
+    }
+
+    // Burn effect
     public void ApplyBurn(int totalBurnDamage, float burnDuration)
     {
         if (isBurning)
@@ -75,45 +117,67 @@ public abstract class FighterBase : MonoBehaviour
         burnCoroutine = StartCoroutine(BurnCoroutine(totalBurnDamage, burnDuration));
     }
 
-    // Coroutine to handle burn damage over time
     private IEnumerator BurnCoroutine(int totalBurnDamage, float burnDuration)
     {
         isBurning = true;
-
         yield return new WaitForSeconds(1f);
 
         float damagePerSecond = totalBurnDamage / burnDuration;
-
-        // Track the damage that will be applied
         float pendingDamage = 0f;
-
-        // Keep track of how long the burn lasts
         float elapsedTime = 0f;
 
         Debug.Log($"{fighterName} is burning for {totalBurnDamage} damage over {burnDuration} seconds.");
 
-        // Smooth burn damage applied over burn duration
         while (elapsedTime < burnDuration)
         {
             elapsedTime += Time.deltaTime;
-
-            // Accumulate burn damage based on time passed
             pendingDamage += damagePerSecond * Time.deltaTime;
 
-            // Apply the accumulated damage when it reaches 1 or more, rounded to the nearest integer
             if (pendingDamage >= 1f)
             {
-                int damageToApply = Mathf.FloorToInt(pendingDamage); // Rounded down to avoid dealing more damage
+                int damageToApply = Mathf.FloorToInt(pendingDamage);
                 TakeDamage(damageToApply);
-                pendingDamage -= damageToApply; // Reset accumulated damage after applying
+                pendingDamage -= damageToApply;
 
                 Debug.Log($"{fighterName} burned for {damageToApply} damage. Current HP: {currentHealth}");
             }
 
-            yield return null; // Wait until the next frame
+            yield return null;
         }
-        
+
         isBurning = false;
-        Debug.Log($"{fighterName}'s smooth burn effect ended.");
+        Debug.Log($"{fighterName}'s burn effect ended.");
+    }
+
+    // Stun effect
+    public void Stun(float duration)
+    {
+        if (isStunned) return;
+
+        Debug.Log($"{fighterName} is stunned for {duration} seconds.");
+        StartCoroutine(StunCoroutine(duration));
+    }
+
+    private IEnumerator StunCoroutine(float duration)
+    {
+        isStunned = true;
+
+        PlayerMove move = GetComponent<PlayerMove>();
+        if (move != null)
+        {
+            move.BlockMovement(true);
+        }
+
+        yield return new WaitForSeconds(duration);
+
+        isStunned = false;
+
+        // Unblock movement
+        if (move != null)
+        {
+            move.BlockMovement(false);
+        }
+
+        Debug.Log($"{fighterName} is no longer stunned.");
     }
 }

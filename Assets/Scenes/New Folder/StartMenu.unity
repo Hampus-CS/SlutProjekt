@@ -2598,8 +2598,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a322b67ee4e66b458c60ded997c3972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostButton: {fileID: 0}
-  joinButton: {fileID: 0}
+  hostButton: {fileID: 6319560825788189256}
+  joinButton: {fileID: 2815110985959736877}
   ipInputField: {fileID: 1925518486}
   waitingPanel: {fileID: 1906404854}
   connectingPanel: {fileID: 1229265186}

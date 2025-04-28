@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
@@ -28,6 +29,7 @@ public class PlayerMove : NetworkBehaviour
 
     private bool movingLeft;
     private bool movingRight;
+    private bool isMovementBlocked;
 
     private Vector2 moveDirection = Vector2.zero;
     private SpriteRenderer spriteRenderer;
@@ -41,7 +43,11 @@ public class PlayerMove : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return; // Prevent non-owners from moving
-        
+        if (isMovementBlocked)
+        {
+            BlockMovement(true);
+            return;
+        }
         if (isDashing) return;
 
         movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
@@ -77,7 +83,7 @@ public class PlayerMove : NetworkBehaviour
             StartDash();
         }
 
-        
+
         if (movingLeft)
         {
             FlipPlayer(true);
@@ -91,7 +97,8 @@ public class PlayerMove : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!IsOwner) return; // Prevent non-owners from moving
-        
+        if (isMovementBlocked) return;
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         if (isDashing)
@@ -101,6 +108,14 @@ public class PlayerMove : NetworkBehaviour
         }
 
         HandleMovement();
+    }
+
+    public void BlockMovement(bool isMovementBlocked)
+    {
+        if (isMovementBlocked)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
     }
 
     private void HandleMovement()
@@ -116,10 +131,10 @@ public class PlayerMove : NetworkBehaviour
         float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
 
         // Apply movement to the Rigidbody2D
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y); 
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y);
 
         // If velocity is close to zero and no movement direction, snap to 0 (stop)
-        if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero) 
+        if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         }
