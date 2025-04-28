@@ -15,7 +15,7 @@ public class LightningBolt : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(impactDamage);
-            target.Stun(stunDuration);
+            target.ApplyStun(stunDuration);
             Destroy(gameObject);
         }
     }

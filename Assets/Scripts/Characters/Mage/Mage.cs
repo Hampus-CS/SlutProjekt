@@ -13,9 +13,16 @@ public class Mage : FighterBase
     private float lastFireballTime = -Mathf.Infinity;
     public int fireballCost = 20;
 
+    private StatusEffectManager statusEffectManager;
+
+
+    private void Start()
+    {
+        statusEffectManager = GetComponent<StatusEffectManager>();
+    }
     protected override void Update()
     {
-        base.Update();
+        if (statusEffectManager.IsStunned()) return;
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastFireballTime + fireballCooldown)
         {
@@ -39,24 +46,36 @@ public class Mage : FighterBase
             GameObject fireball = Instantiate(fireballPrefab, firePoint.position, Quaternion.identity);
             Rigidbody2D rb = fireball.GetComponent<Rigidbody2D>();
 
-            float direction = transform.localScale.x > 0 ? 1f : -1f;
+            float direction = 1f;
+            if (transform.localScale.x < 0)
+            {
+                direction = -1f;
+            }
             rb.linearVelocity = new Vector2(direction * fireballSpeed, 0f);
 
             Vector3 scale = fireball.transform.localScale;
-            scale.x = direction > 0 ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+            if (direction < 0)
+            {
+                scale.x = -Mathf.Abs(scale.x);
+            }
+            else
+            {
+                scale.x = Mathf.Abs(scale.x);
+            }
             fireball.transform.localScale = scale;
         }
     }
 
+
     public override void Attack(FighterBase opponent)
     {
-        if (isStunned)
+        if (statusEffectManager != null && statusEffectManager.IsStunned())
         {
             Debug.Log($"{fighterName} is stunned and cannot attack!");
             return;
         }
+
         int damage = baseAttackPower + 2;
-        Debug.Log($"{fighterName} (Mage) casts a fireball at {opponent.fighterName}, dealing {damage} magic damage!");
         opponent.TakeDamage(damage);
     }
 }

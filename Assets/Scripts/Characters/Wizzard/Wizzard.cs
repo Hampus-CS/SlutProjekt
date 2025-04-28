@@ -1,4 +1,5 @@
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 
 public class Wizzard : FighterBase
@@ -6,37 +7,30 @@ public class Wizzard : FighterBase
     [Header("Wizzard Settings")]
     public GameObject lightningBoltPrefab;
     public Transform firePoint;
+
     [Header("Lightning Bolt")]
     public float lightningBoltSpeed = 15f;
     public float lightningBoltCooldown = 3f;
     private float lastLightningBoltTime = -Mathf.Infinity;
-   
-    [Header("Mana System")]
-    private float maxMana = 100f;
-    private float currentMana;
     public int lightningBoltCost = 30;
-    public float manaRegenerationRate = 5f;
 
-    public TextMeshProUGUI manaText; // temp for testing, preferably a UI slider or something
+    private StatusEffectManager statusEffectManager;
+
     private void Start()
     {
-        currentMana = maxMana;
+        statusEffectManager = GetComponent<StatusEffectManager>();
     }
     private void Update()
     {
-        // Recharge mana slowly over time
-        if (currentMana < maxMana)
-        {
-            currentMana += manaRegenerationRate * Time.deltaTime;
-            if (currentMana > maxMana) currentMana = maxMana;
-        }
+        if (statusEffectManager.IsStunned()) return;
+
         // Lightning bolt cooldown and mana check
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastLightningBoltTime + lightningBoltCooldown)
         {
             if (currentMana >= lightningBoltCost)
             {
-                CastLightningBolt();
-                currentMana -= lightningBoltCost;
+                ShootLightningBolt();
+                SpendMana(lightningBoltCost);
                 lastLightningBoltTime = Time.time;
             }
             else
@@ -44,23 +38,32 @@ public class Wizzard : FighterBase
                 Debug.Log("Not enough mana!");
             }
         }
-        if (manaText != null)
-        {
-            manaText.text = "Mana: " + Mathf.FloorToInt(currentMana).ToString();  // Display current mana
-        }
     }
-    void CastLightningBolt()
+    void ShootLightningBolt()
     {
-        GameObject lightningBolt = Instantiate(lightningBoltPrefab, firePoint.position, firePoint.rotation);
-        Rigidbody rb = lightningBolt.GetComponent<Rigidbody>();
-        rb.linearVelocity = firePoint.forward * lightningBoltSpeed;
-        Destroy(lightningBolt, 2f); // Destroy after 2 seconds
+        if (lightningBoltPrefab != null && firePoint != null)
+        {
+            GameObject lightningBolt = Instantiate(lightningBoltPrefab, firePoint.position, Quaternion.identity);
+            Rigidbody2D rb = lightningBolt.GetComponent<Rigidbody2D>();
+
+            float direction = transform.localScale.x > 0 ? 1f : -1f;
+            rb.linearVelocity = new Vector2(direction * lightningBoltSpeed, 0f);
+
+            Vector3 scale = lightningBolt.transform.localScale;
+            scale.x = direction > 0 ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+            lightningBolt.transform.localScale = scale;
+        }
     }
 
     public override void Attack(FighterBase opponent)
     {
-        int damage = baseAttackPower + 2; // Less than Warrior but maybe could be a ranged attack later or something like that. But for now 
-        Debug.Log($"{fighterName} (Mage) casts a fireball at {opponent.fighterName}, dealing {damage} magic damage!");
+        if (statusEffectManager != null && statusEffectManager.IsStunned())
+        {
+            Debug.Log($"{fighterName} is stunned and cannot attack!");
+            return;
+        }
+
+        int damage = baseAttackPower + 2;
         opponent.TakeDamage(damage);
     }
 }

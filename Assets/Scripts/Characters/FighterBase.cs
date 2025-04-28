@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using TMPro;
 
 public abstract class FighterBase : MonoBehaviour
@@ -19,10 +18,7 @@ public abstract class FighterBase : MonoBehaviour
     public float currentMana;
     public float manaRegenerationRate = 5f;
 
-    // Status effect management
-    private bool isBurning = false;
-    public bool isStunned = false;
-    private Coroutine burnCoroutine;
+    private StatusEffectManager statusEffectManager;
 
     protected virtual void Start()
     {
@@ -30,17 +26,18 @@ public abstract class FighterBase : MonoBehaviour
         currentMana = maxMana;
         UpdateHPText();
         UpdateManaText();
+
+        statusEffectManager = GetComponent<StatusEffectManager>();
+        if (statusEffectManager == null)
+        {
+            Debug.LogError("StatusEffectManager not found on " + gameObject.name);
+        }
     }
 
     protected virtual void Update()
     {
         RegenerateMana();
-
-        if (hpText != null)
-        {
-            hpText.text = "HP: " + currentHealth;
-        }
-
+        UpdateHPText();
         UpdateManaText();
     }
 
@@ -86,7 +83,8 @@ public abstract class FighterBase : MonoBehaviour
         if (currentMana < maxMana)
         {
             currentMana += manaRegenerationRate * Time.deltaTime;
-            if (currentMana > maxMana) currentMana = maxMana;
+            if (currentMana > maxMana)
+                currentMana = maxMana;
         }
     }
 
@@ -105,79 +103,20 @@ public abstract class FighterBase : MonoBehaviour
         }
     }
 
-    // Burn effect
+    // Status Effects
     public void ApplyBurn(int totalBurnDamage, float burnDuration)
     {
-        if (isBurning)
+        if (statusEffectManager != null)
         {
-            StopCoroutine(burnCoroutine);
-            isBurning = false;
+            statusEffectManager.ApplyBurn(totalBurnDamage, burnDuration);
         }
-
-        burnCoroutine = StartCoroutine(BurnCoroutine(totalBurnDamage, burnDuration));
     }
 
-    private IEnumerator BurnCoroutine(int totalBurnDamage, float burnDuration)
+    public void ApplyStun(float stunDuration)
     {
-        isBurning = true;
-        yield return new WaitForSeconds(1f);
-
-        float damagePerSecond = totalBurnDamage / burnDuration;
-        float pendingDamage = 0f;
-        float elapsedTime = 0f;
-
-        Debug.Log($"{fighterName} is burning for {totalBurnDamage} damage over {burnDuration} seconds.");
-
-        while (elapsedTime < burnDuration)
+        if (statusEffectManager != null)
         {
-            elapsedTime += Time.deltaTime;
-            pendingDamage += damagePerSecond * Time.deltaTime;
-
-            if (pendingDamage >= 1f)
-            {
-                int damageToApply = Mathf.FloorToInt(pendingDamage);
-                TakeDamage(damageToApply);
-                pendingDamage -= damageToApply;
-
-                Debug.Log($"{fighterName} burned for {damageToApply} damage. Current HP: {currentHealth}");
-            }
-
-            yield return null;
+            statusEffectManager.ApplyStun(stunDuration);
         }
-
-        isBurning = false;
-        Debug.Log($"{fighterName}'s burn effect ended.");
-    }
-
-    // Stun effect
-    public void Stun(float duration)
-    {
-        if (isStunned) return;
-
-        Debug.Log($"{fighterName} is stunned for {duration} seconds.");
-        StartCoroutine(StunCoroutine(duration));
-    }
-
-    private IEnumerator StunCoroutine(float duration)
-    {
-        isStunned = true;
-
-        PlayerMove move = GetComponent<PlayerMove>();
-        if (move != null)
-        {
-            move.BlockMovement(true);
-        }
-
-        yield return new WaitForSeconds(duration);
-
-        isStunned = false;
-
-        // Unblock movement
-        if (move != null)
-        {
-            move.BlockMovement(false);
-        }
-
-        Debug.Log($"{fighterName} is no longer stunned.");
     }
 }

@@ -17,6 +17,7 @@ public class PlayerMove : NetworkBehaviour
     public float dashDuration = 0.2f;
     public float stopThreshold = 0.05f;
 
+
     [Header("Ground Check")]
     public LayerMask groundLayer;
     public Transform groundCheck;
@@ -29,7 +30,7 @@ public class PlayerMove : NetworkBehaviour
 
     private bool movingLeft;
     private bool movingRight;
-    private bool isMovementBlocked;
+    public bool isMovementBlocked;
 
     private Vector2 moveDirection = Vector2.zero;
     private SpriteRenderer spriteRenderer;
@@ -42,13 +43,9 @@ public class PlayerMove : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsOwner) return; // Prevent non-owners from moving
-        if (isMovementBlocked)
-        {
-            BlockMovement(true);
-            return;
-        }
+        //  if (!IsOwner) return; // Prevent non-owners from moving
         if (isDashing) return;
+        if (isMovementBlocked) return;
 
         movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
@@ -61,10 +58,12 @@ public class PlayerMove : NetworkBehaviour
         else if (movingLeft)
         {
             moveDirection = Vector2.left;
+            print("Moving Left");
         }
         else if (movingRight)
         {
             moveDirection = Vector2.right;
+            print("Moving Right");
         }
         else
         {
@@ -96,7 +95,7 @@ public class PlayerMove : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsOwner) return; // Prevent non-owners from moving
+        // if (!IsOwner) return; // Prevent non-owners from moving
         if (isMovementBlocked) return;
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);

@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 101057208}
   - component: {fileID: 101057210}
   - component: {fileID: 101057211}
+  - component: {fileID: 101057212}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -183,7 +184,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -229,7 +230,6 @@ MonoBehaviour:
   maxMana: 100
   currentMana: 0
   manaRegenerationRate: 5
-  isStunned: 0
 --- !u!61 &101057211
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -276,6 +276,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &101057212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101057207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4ecb38cea214c43965e63d518d0d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &246873960
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,7 +563,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -119, y: 110}
+  m_AnchoredPosition: {x: -119, y: 490}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &511268244
@@ -837,7 +849,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -118, y: 51}
+  m_AnchoredPosition: {x: -1338, y: 51}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &694309941
@@ -1092,6 +1104,7 @@ GameObject:
   - component: {fileID: 997898209}
   - component: {fileID: 997898207}
   - component: {fileID: 997898210}
+  - component: {fileID: 997898211}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1262,6 +1275,7 @@ MonoBehaviour:
     m_Bits: 64
   groundCheck: {fileID: 246873961}
   groundCheckRadius: 0.2
+  isMovementBlocked: 0
 --- !u!114 &997898209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1308,14 +1322,23 @@ MonoBehaviour:
   maxMana: 100
   currentMana: 0
   manaRegenerationRate: 5
-  isStunned: 0
   lightningBoltPrefab: {fileID: 8913347900330227479, guid: 7f26920a396babc4a9c595865db9345f, type: 3}
   firePoint: {fileID: 2037487259}
   lightningBoltSpeed: 15
   lightningBoltCooldown: 3
   lightningBoltCost: 30
-  manaRegenerationRate: 5
-  manaText: {fileID: 0}
+--- !u!114 &997898211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 997898201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4ecb38cea214c43965e63d518d0d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1014002092
 GameObject:
   m_ObjectHideFlags: 0
@@ -2270,7 +2293,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 173, y: 84}
+  m_AnchoredPosition: {x: 797, y: 487}
   m_SizeDelta: {x: 133.68, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1660057539 &9223372036854775807

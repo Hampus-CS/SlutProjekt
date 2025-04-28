@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class Fireball : MonoBehaviour
 {
@@ -18,9 +17,7 @@ public class Fireball : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(impactDamage);
-
             target.ApplyBurn(totalBurnDamage, burnDuration);
-
             Destroy(gameObject);
         }
     }
