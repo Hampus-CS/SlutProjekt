@@ -22,14 +22,29 @@ public class LANBroadcastClient : MonoBehaviour
 
     private void Start()
     {
-        // Important: Bind UDP listener to 0.0.0.0 (all interfaces)
-        udpListener = new UdpClient(new IPEndPoint(IPAddress.Any, broadcastPort));
-        udpListener.EnableBroadcast = true;
+        if (udpListener != null)
+        {
+            Debug.LogWarning("[LANBroadcastClient] Listener already active. Skipping Start.");
+            return;
+        }
+        
+        try
+        {
+            // Important: Bind UDP listener to 0.0.0.0 (all interfaces)
+            udpListener = new UdpClient(new IPEndPoint(IPAddress.Any, broadcastPort));
+            udpListener.EnableBroadcast = true;
 
-        isListening = true;
-        listenThread = new Thread(ListenForBroadcast);
-        listenThread.IsBackground = true;
-        listenThread.Start();
+            isListening = true;
+            listenThread = new Thread(ListenForBroadcast);
+            listenThread.IsBackground = true;
+            listenThread.Start();
+            
+            Debug.Log("[LANBroadcastClient] Started listening for broadcasts.");
+        }
+        catch (SocketException ex)
+        {
+            Debug.LogError($"[LANBroadcastClient] Failed to start listener: {ex.Message}");
+        }
     }
 
     private void ListenForBroadcast()
@@ -66,10 +81,12 @@ public class LANBroadcastClient : MonoBehaviour
         if (udpListener != null)
         {
             udpListener.Close();
+            udpListener = null; // Important: Null it after closing
         }
         if (listenThread != null && listenThread.IsAlive)
         {
             listenThread.Abort();
+            listenThread = null; // Important: Null the thread reference
         }
     }
 }
