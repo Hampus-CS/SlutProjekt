@@ -17,7 +17,6 @@ public class PlayerMove : NetworkBehaviour
     public float dashDuration = 0.2f;
     public float stopThreshold = 0.05f;
 
-
     [Header("Ground Check")]
     public LayerMask groundLayer;
     public Transform groundCheck;
@@ -28,8 +27,6 @@ public class PlayerMove : NetworkBehaviour
     private bool isDashing;
     private float dashTimer;
 
-    private bool movingLeft;
-    private bool movingRight;
     public bool isMovementBlocked;
 
     private Vector2 moveDirection = Vector2.zero;
@@ -43,27 +40,28 @@ public class PlayerMove : NetworkBehaviour
 
     private void Update()
     {
-        //  if (!IsOwner) return; // Prevent non-owners from moving
+        // if (!IsOwner) return; // Prevent non-owners from moving
         if (isDashing) return;
         if (isMovementBlocked) return;
 
-        movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-        movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
 
-        // Handle movement direction
-        if (movingLeft && movingRight)
-        {
-            moveDirection = Vector2.zero; // Stop if both keys are pressed
-        }
-        else if (movingLeft)
+        // Handling movement direction
+        bool movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+
+
+        if (movingLeft)
         {
             moveDirection = Vector2.left;
-            print("Moving Left");
         }
         else if (movingRight)
         {
             moveDirection = Vector2.right;
-            print("Moving Right");
+        }
+
+        else if (movingLeft && movingRight)
+        {
+            moveDirection = Vector2.zero; // Stop if both keys are pressed
         }
         else
         {
@@ -82,7 +80,7 @@ public class PlayerMove : NetworkBehaviour
             StartDash();
         }
 
-
+        // Flip player based on movement direction
         if (movingLeft)
         {
             FlipPlayer(true);
@@ -97,6 +95,7 @@ public class PlayerMove : NetworkBehaviour
     {
         // if (!IsOwner) return; // Prevent non-owners from moving
         if (isMovementBlocked) return;
+
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
@@ -119,20 +118,23 @@ public class PlayerMove : NetworkBehaviour
 
     private void HandleMovement()
     {
-        // Calculate target speed based on move direction and speed
         float targetSpeed = moveDirection.x * moveSpeed;
         float speedDiff = targetSpeed - rb.linearVelocity.x;
 
-        // Use acceleration if moving, deceleration if stopping
-        float accelRate = moveDirection != Vector2.zero ? acceleration : deceleration;
+        float accelRate;
+        if (moveDirection != Vector2.zero)
+        {
+            accelRate = acceleration;
+        }
+        else
+        {
+            accelRate = deceleration;
+        }
 
-        // Smooth movement with a velocity curve
         float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
 
-        // Apply movement to the Rigidbody2D
         rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y);
 
-        // If velocity is close to zero and no movement direction, snap to 0 (stop)
         if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -158,7 +160,6 @@ public class PlayerMove : NetworkBehaviour
 
     private void FlipPlayer(bool flipLeft)
     {
-        // Flip the entire player's transform based on movement direction
         Vector3 scale = transform.localScale;
 
         if (flipLeft)

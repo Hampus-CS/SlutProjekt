@@ -84,7 +84,9 @@ public abstract class FighterBase : MonoBehaviour
         {
             currentMana += manaRegenerationRate * Time.deltaTime;
             if (currentMana > maxMana)
+            {
                 currentMana = maxMana;
+            }
         }
     }
 

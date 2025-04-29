@@ -46,11 +46,29 @@ public class Wizzard : FighterBase
             GameObject lightningBolt = Instantiate(lightningBoltPrefab, firePoint.position, Quaternion.identity);
             Rigidbody2D rb = lightningBolt.GetComponent<Rigidbody2D>();
 
-            float direction = transform.localScale.x > 0 ? 1f : -1f;
+            float direction;
+            if (transform.localScale.x > 0)
+            {
+                direction = 1f;
+            }
+            else
+            {
+                direction = -1f;
+            }
+
             rb.linearVelocity = new Vector2(direction * lightningBoltSpeed, 0f);
 
             Vector3 scale = lightningBolt.transform.localScale;
-            scale.x = direction > 0 ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+
+            if (direction > 0)
+            {
+                scale.x = Mathf.Abs(scale.x);
+            }
+            else
+            {
+                scale.x = -Mathf.Abs(scale.x);
+            }
+
             lightningBolt.transform.localScale = scale;
         }
     }

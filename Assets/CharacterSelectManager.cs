@@ -73,21 +73,24 @@ public class CharacterCarouselSelector : MonoBehaviour
         if (img.TryGetComponent<CanvasGroup>(out var group))
         {
             if (!instant)
+            {
                 group.alpha = 1f;
-
-            if (instant)
-                group.alpha = alpha;
-            else
                 group.DOFade(alpha, 0.4f).SetEase(Ease.InOutQuad);
+            }
+            else
+            {
+                group.alpha = alpha;
+            }
         }
 
         if (!instant)
+        {
             img.rectTransform.localScale = Vector3.one;
-
-        if (instant)
-            img.rectTransform.localScale = Vector3.one * scale;
+        }
         else
+        {
+            img.rectTransform.localScale = Vector3.one * scale;
             img.rectTransform.DOScale(Vector3.one * scale, 0.4f).SetEase(Ease.OutBack);
+        }
     }
-
 }

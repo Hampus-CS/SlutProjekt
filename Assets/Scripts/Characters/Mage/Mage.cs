@@ -54,6 +54,7 @@ public class Mage : FighterBase
             rb.linearVelocity = new Vector2(direction * fireballSpeed, 0f);
 
             Vector3 scale = fireball.transform.localScale;
+
             if (direction < 0)
             {
                 scale.x = -Mathf.Abs(scale.x);
