@@ -15,7 +15,7 @@ public class CharacterCarouselSelector : MonoBehaviour
 
     void Start()
     {
-        UpdateSlots(true); // first time: no animation
+        UpdateSlots(true);
     }
 
     void Update()
@@ -73,7 +73,7 @@ public class CharacterCarouselSelector : MonoBehaviour
         if (img.TryGetComponent<CanvasGroup>(out var group))
         {
             if (!instant)
-                group.alpha = 1f; // Force reset first
+                group.alpha = 1f;
 
             if (instant)
                 group.alpha = alpha;
@@ -82,7 +82,7 @@ public class CharacterCarouselSelector : MonoBehaviour
         }
 
         if (!instant)
-            img.rectTransform.localScale = Vector3.one; // Reset to default before animating
+            img.rectTransform.localScale = Vector3.one;
 
         if (instant)
             img.rectTransform.localScale = Vector3.one * scale;
