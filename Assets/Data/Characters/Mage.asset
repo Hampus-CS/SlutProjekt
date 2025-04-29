@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c07c979d4c7ebe147972283c4c17cc44, type: 3}
+  m_Name: Mage
+  m_EditorClassIdentifier: 
+  id: 1
+  displayName: Sylvara, Flame Seer
+  lore: Born amidst the volcanic spires of the distant Ember Isles, Sylvara possessed
+    an innate affinity for fire magic. Shunned by villagers fearful of her uncontrollable
+    powers, she traveled from city to city, hiding among the crowded slums. Street
+    combat became her path to acceptance; every match was an opportunity to control
+    and master her fiery gift. Sylvara's blazing fireballs have since become legendary,
+    illuminating the darkest alleys as crowds chant the name of the feared yet revered
+    "Flame Seer."
+  idleSprite: {fileID: 0}
+  basicAttackSprite: {fileID: 0}
+  abilitySprite: {fileID: 0}
+  fighterPrefab: {fileID: 5251138399461381211, guid: 897db42b462e1304ba1b7313c7216ece, type: 3}
+  maxHealth: 100
+  attackPower: 10
