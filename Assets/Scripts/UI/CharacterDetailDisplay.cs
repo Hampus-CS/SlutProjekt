@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CharacterDetailDisplay : MonoBehaviour
+public class CharacterDetailDisplay : CharacterCarouselSelector
 {
     [Header("Image Slots")]
     public Image portraitIdle;

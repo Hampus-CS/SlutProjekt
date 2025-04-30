@@ -1,23 +1,27 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 using DG.Tweening;
 
 public class CharacterCarouselSelector : MonoBehaviour
 {
     [Header("Character Data List")]
-    public List<CharacterData> characters;
+    [SerializeField] private List<CharacterData> characters;
 
     [Header("UI References")]
-    public Image slotLeft;
-    public Image slotCenter;
-    public Image slotRight;
+    
+    [SerializeField] private Image slotLeft;
+    [SerializeField] private Image slotCenter;
+    [SerializeField] private Image slotRight;
 
     [Header("Panels to Toggle")]
-    public GameObject characterCarouselPanel;
-    public GameObject characterDetailPanelRoot;
+    [SerializeField] private GameObject characterCarouselPanel;
+    [SerializeField] private GameObject characterDetailPanelRoot;
 
-    private int selectedIndex = 0;
+    [SerializeField] private int selectedIndex = 0;
+
+    private bool canScroll = true;
 
     void Start()
     {
@@ -31,18 +35,23 @@ public class CharacterCarouselSelector : MonoBehaviour
 
     void Update()
     {
+        if (!canScroll) return;
+
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            ScrollLeft();
-        }
+            StartCoroutine(ScrollCooldown(ScrollLeft));
         else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            ScrollRight();
-        }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
+            StartCoroutine(ScrollCooldown(ScrollRight));
+
+        if (Input.GetKeyDown(KeyCode.Space))
             SelectCurrentCharacter();
-        }
+    }
+
+    private IEnumerator ScrollCooldown(System.Action scrollAction)
+    {
+        canScroll = false;
+        scrollAction.Invoke();
+        yield return new WaitForSeconds(0.5f);
+        canScroll = true;
     }
 
     public void ScrollLeft()
