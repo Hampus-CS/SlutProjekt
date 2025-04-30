@@ -24,7 +24,7 @@ MonoBehaviour:
     title "Storm Sage."
   idleSprite: {fileID: 4723107735738678597, guid: 35e9a656a25934d438da17f89d3c4c77, type: 3}
   basicAttackSprite: {fileID: 6934013284892070054, guid: 62244c0f0e3ed4f4696cc63b1ede0915, type: 3}
-  abilitySprite: {fileID: 0}
+  abilitySprite: {fileID: 9220252021294270350, guid: bb788b95a0b598843a413173b20a30ba, type: 3}
   fighterPrefab: {fileID: 5251138399461381211, guid: 55797f11487b8a849816cafa58f3cc84, type: 3}
   maxHealth: 100
   attackPower: 10
