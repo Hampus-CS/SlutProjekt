@@ -10,13 +10,12 @@ public class CharacterCarouselSelector : MonoBehaviour
     [SerializeField] private List<CharacterData> characters;
 
     [Header("UI References")]
-    
     [SerializeField] private Image slotLeft;
     [SerializeField] private Image slotCenter;
     [SerializeField] private Image slotRight;
 
     [Header("Panels to Toggle")]
-    [SerializeField] private GameObject characterCarouselPanel;
+    [SerializeField] private GameObject characterCarouselPanelRoot;
     [SerializeField] private GameObject characterDetailPanelRoot;
 
     [SerializeField] private int selectedIndex = 0;
@@ -75,7 +74,7 @@ public class CharacterCarouselSelector : MonoBehaviour
 
         Debug.Log("Selected character: " + selected.displayName + " (ID: " + selected.id + ")");
 
-        PanelTransition.SwapPanels(characterCarouselPanel, characterDetailPanelRoot);
+        PanelTransition.SwapPanels(characterCarouselPanelRoot, characterDetailPanelRoot);
     }
 
     void UpdateSlots(bool instant)

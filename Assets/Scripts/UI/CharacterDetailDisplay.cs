@@ -12,6 +12,8 @@ public class CharacterDetailDisplay : CharacterCarouselSelector
     [Header("Text Slots")]
     public TMP_Text nameText;
     public TMP_Text loreText;
+    public TMP_Text basicAttackText;
+    public TMP_Text abilityText;
 
     void OnEnable()
     {
@@ -34,5 +36,7 @@ public class CharacterDetailDisplay : CharacterCarouselSelector
 
         nameText.text = selected.displayName;
         loreText.text = selected.lore;
+        basicAttackText.text = selected.basicAttackDescription;
+        abilityText.text = selected.abilityDescription;
     }
 }

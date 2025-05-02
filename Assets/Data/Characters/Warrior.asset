@@ -21,6 +21,8 @@ MonoBehaviour:
     sheer resilience and masterful weaponry. Known as "The Iron Guardian," his brute
     strength and relentless style have carved a legend into the stone-cobbled streets,
     inspiring awe and dread in every fight he enters.
+  abilityDescription: Ability Description Placeholder
+  basicAttackDescription: Basic Attack Description Placeholder
   idleSprite: {fileID: 0}
   basicAttackSprite: {fileID: 0}
   abilitySprite: {fileID: 0}

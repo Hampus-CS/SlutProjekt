@@ -476,7 +476,7 @@ GameObject:
   - component: {fileID: 61590276}
   - component: {fileID: 61590277}
   m_Layer: 5
-  m_Name: CharacterCarouselPanel
+  m_Name: CharacterCarouselPanelRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -804,7 +804,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 458.3333, y: -225}
+  m_AnchoredPosition: {x: 91.66669, y: -225}
   m_SizeDelta: {x: 150, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &571925769
@@ -1057,7 +1057,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 721421330}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1635357347}
+        m_TargetAssemblyTypeName: CharacterCarouselSelector, Assembly-CSharp
+        m_MethodName: ScrollRight
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &721421330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1281,7 +1293,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 892077509}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1635357347}
+        m_TargetAssemblyTypeName: CharacterCarouselSelector, Assembly-CSharp
+        m_MethodName: SelectCurrentCharacter
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &892077509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1356,7 +1380,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 91.66669, y: -225}
+  m_AnchoredPosition: {x: 458.3333, y: -225}
   m_SizeDelta: {x: 150, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &995835259
@@ -1643,7 +1667,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1051451395}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1635357347}
+        m_TargetAssemblyTypeName: CharacterCarouselSelector, Assembly-CSharp
+        m_MethodName: ScrollLeft
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1051451395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2581,11 +2617,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a1170586d7ecd746ad458eaffd2b81e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characters:
+  - {fileID: 11400000, guid: 7621311a0179da4488637060f80fa2b4, type: 2}
+  - {fileID: 11400000, guid: 0797a0752fb812647a64b07216721fc0, type: 2}
+  - {fileID: 11400000, guid: f39c7fec0d994a54699c83eaf926c851, type: 2}
+  slotLeft: {fileID: 571925771}
+  slotCenter: {fileID: 1215318147}
+  slotRight: {fileID: 995835261}
+  characterCarouselPanelRoot: {fileID: 61590275}
+  characterDetailPanelRoot: {fileID: 1635357344}
+  selectedIndex: 0
   portraitIdle: {fileID: 1215318147}
   basicAttack: {fileID: 571925771}
   abilityAttack: {fileID: 995835261}
   nameText: {fileID: 48217434}
   loreText: {fileID: 1593517826}
+  basicAttackText: {fileID: 1593517826}
+  abilityText: {fileID: 1593517826}
 --- !u!1 &1658487550
 GameObject:
   m_ObjectHideFlags: 0
@@ -2616,9 +2664,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 995835258}
-  - {fileID: 1215318144}
   - {fileID: 571925768}
+  - {fileID: 1215318144}
+  - {fileID: 995835258}
   m_Father: {fileID: 1635357345}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2749,8 +2797,9 @@ MonoBehaviour:
   slotLeft: {fileID: 505855962}
   slotCenter: {fileID: 1238963136}
   slotRight: {fileID: 718510130}
-  characterCarouselPanel: {fileID: 61590275}
+  characterCarouselPanelRoot: {fileID: 61590275}
   characterDetailPanelRoot: {fileID: 1635357344}
+  selectedIndex: 0
 --- !u!1 &2038999318
 GameObject:
   m_ObjectHideFlags: 0

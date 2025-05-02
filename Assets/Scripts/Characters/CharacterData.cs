@@ -8,6 +8,8 @@ public class CharacterData : ScriptableObject
     public int id; // 0,1,2 : MUST be unique
     public string displayName;
     [TextArea] public string lore;
+    [TextArea] public string abilityDescription;
+    [TextArea] public string basicAttackDescription;
 
     [Header("Artwork")]
     public Sprite idleSprite; // Carousel + main portrait

@@ -21,6 +21,8 @@ MonoBehaviour:
     and master her fiery gift. Sylvara's blazing fireballs have since become legendary,
     illuminating the darkest alleys as crowds chant the name of the feared yet revered
     "Flame Seer."
+  abilityDescription: Ability Description Placeholder
+  basicAttackDescription: Basic Attack Description Placeholder
   idleSprite: {fileID: 0}
   basicAttackSprite: {fileID: 0}
   abilitySprite: {fileID: 0}
