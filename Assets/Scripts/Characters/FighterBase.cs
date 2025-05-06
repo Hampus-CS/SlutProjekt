@@ -15,16 +15,16 @@ public abstract class FighterBase : MonoBehaviour
 
     [Header("Mana System")]
     public float maxMana = 100f;
-    public float currentMana;
+    public float currentMana = 100f;
     public float manaRegenerationRate = 5f;
 
     private StatusEffectManager statusEffectManager;
 
-    protected virtual void Start()
+    private void Start()
     {
         currentHealth = maxHealth;
         currentMana = maxMana;
-        UpdateHPText();
+        UpdateHpText();
         UpdateManaText();
 
         statusEffectManager = GetComponent<StatusEffectManager>();
@@ -34,10 +34,10 @@ public abstract class FighterBase : MonoBehaviour
         }
     }
 
-    protected virtual void Update()
+    private void FixedUpdate()
     {
         RegenerateMana();
-        UpdateHPText();
+        UpdateHpText();
         UpdateManaText();
     }
 
@@ -51,7 +51,7 @@ public abstract class FighterBase : MonoBehaviour
             Die();
         }
 
-        UpdateHPText();
+        UpdateHpText();
     }
 
     public abstract void Attack(FighterBase opponent);
@@ -62,11 +62,15 @@ public abstract class FighterBase : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void UpdateHPText()
+    private void UpdateHpText()
     {
         if (hpText != null)
         {
             hpText.text = "HP: " + currentHealth;
+        }
+        else
+        {
+            Debug.LogWarning("hpText is not assigned on " + gameObject.name);
         }
     }
 
@@ -90,12 +94,12 @@ public abstract class FighterBase : MonoBehaviour
         }
     }
 
-    public bool HasEnoughMana(int amount)
+    protected bool HasEnoughMana(int amount)
     {
         return currentMana >= amount;
     }
 
-    public void SpendMana(int amount)
+    protected void SpendMana(int amount)
     {
         currentMana -= amount;
 

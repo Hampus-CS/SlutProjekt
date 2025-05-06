@@ -42,11 +42,12 @@ GameObject:
   - component: {fileID: 2718835059480899194}
   - component: {fileID: 6161376407950893077}
   - component: {fileID: 2870322328038562573}
+  - component: {fileID: 8655087283997866265}
   - component: {fileID: 7598995029456177201}
   - component: {fileID: 7860834423221356869}
-  - component: {fileID: 8655087283997866265}
-  - component: {fileID: 4224143124111838119}
   - component: {fileID: 2896229071126493811}
+  - component: {fileID: 4224143124111838119}
+  - component: {fileID: 8656149867966757604}
   m_Layer: 7
   m_Name: Warrior
   m_TagString: Player
@@ -152,6 +153,43 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!70 &8655087283997866265
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 1, y: 2}
+  m_Direction: 0
 --- !u!114 &7598995029456177201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,70 +232,6 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!70 &8655087283997866265
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5251138399461381211}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 2}
-  m_Direction: 0
---- !u!114 &4224143124111838119
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5251138399461381211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d71e434d3d6ea3c49a1773d6e2c5c735, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  moveSpeed: 7
-  acceleration: 60
-  deceleration: 40
-  velocityPower: 0.95
-  jumpForce: 5
-  dashSpeed: 15
-  dashDuration: 0.2
-  stopThreshold: 0.05
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  groundCheck: {fileID: 7860158761740945772}
-  groundCheckRadius: 0.6
-  isMovementBlocked: 0
 --- !u!114 &2896229071126493811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,3 +278,57 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &4224143124111838119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d71e434d3d6ea3c49a1773d6e2c5c735, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  moveSpeed: 7
+  acceleration: 60
+  deceleration: 40
+  velocityPower: 0.95
+  jumpForce: 5
+  dashSpeed: 15
+  dashDuration: 0.2
+  stopThreshold: 0.05
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheck: {fileID: 7860158761740945772}
+  groundCheckRadius: 0.6
+  isMovementBlocked: 0
+--- !u!114 &8656149867966757604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c912afda85127946a8d219aa85ddb73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fighterName: Warrior
+  baseAttackPower: 10
+  currentHealth: 0
+  maxHealth: 100
+  hpText: {fileID: 0}
+  manaText: {fileID: 0}
+  maxMana: 100
+  currentMana: 0
+  manaRegenerationRate: 5
+  dashDistance: 3
+  dashSpeed: 10
+  dashCooldown: 5
+  knockbackForce: 5
+  stunDuration: 0.5
+  dashDamage: 15

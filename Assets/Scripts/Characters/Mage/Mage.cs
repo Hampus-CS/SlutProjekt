@@ -20,7 +20,7 @@ public class Mage : FighterBase
     {
         statusEffectManager = GetComponent<StatusEffectManager>();
     }
-    protected override void Update()
+    void Update()
     {
         if (statusEffectManager.IsStunned()) return;
 
@@ -78,5 +78,6 @@ public class Mage : FighterBase
 
         int damage = baseAttackPower + 2;
         opponent.TakeDamage(damage);
+        Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
     }
 }
