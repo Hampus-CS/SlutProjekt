@@ -43,6 +43,7 @@ public class Mage : FighterBase
             {
                 direction = -1f;
             }
+
             rb.linearVelocity = new Vector2(direction * fireballSpeed, 0f);
 
             Vector3 scale = fireball.transform.localScale;
@@ -55,10 +56,10 @@ public class Mage : FighterBase
             {
                 scale.x = Mathf.Abs(scale.x);
             }
+
             fireball.transform.localScale = scale;
         }
     }
-
 
     public override void Attack(FighterBase opponent)
     {
@@ -67,6 +68,8 @@ public class Mage : FighterBase
             Debug.Log($"{fighterName} is stunned and cannot attack!");
             return;
         }
+
+        PlayAttackAnimation();
 
         int damage = baseAttackPower + 2;
         opponent.TakeDamage(damage);

@@ -32,10 +32,13 @@ public class PlayerMove : NetworkBehaviour
     private Vector2 moveDirection = Vector2.zero;
     private SpriteRenderer spriteRenderer;
 
+    private Animator animator;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -44,11 +47,9 @@ public class PlayerMove : NetworkBehaviour
         if (isDashing) return;
         if (isMovementBlocked) return;
 
-
         // Handling movement direction
         bool movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
-
 
         if (movingLeft)
         {
@@ -67,6 +68,9 @@ public class PlayerMove : NetworkBehaviour
         {
             moveDirection = Vector2.zero; // No movement if neither is pressed
         }
+
+        //  Update animation for movement
+        animator.SetBool("isMoving", moveDirection != Vector2.zero && isGrounded);
 
         // Jump (only if grounded)
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)
@@ -95,7 +99,6 @@ public class PlayerMove : NetworkBehaviour
     {
         // if (!IsOwner) return; // Prevent non-owners from moving
         if (isMovementBlocked) return;
-
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
@@ -168,7 +171,7 @@ public class PlayerMove : NetworkBehaviour
         }
         else
         {
-            scale.x = Mathf.Abs(scale.x);  // Flip to the right
+            scale.x = Mathf.Abs(scale.x); // Flip to the right
         }
 
         transform.localScale = scale;

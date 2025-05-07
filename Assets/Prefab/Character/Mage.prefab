@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 4224143124111838119}
   - component: {fileID: 2896229071126493811}
   - component: {fileID: 7370447110885905259}
+  - component: {fileID: -1751725848324459308}
   m_Layer: 7
   m_Name: Mage
   m_TagString: Player
@@ -326,8 +327,31 @@ MonoBehaviour:
   maxMana: 100
   currentMana: 100
   manaRegenerationRate: 5
+  animator: {fileID: -1751725848324459308}
   fireballPrefab: {fileID: 0}
   firePoint: {fileID: 0}
   fireballSpeed: 10
   fireballCooldown: 5
   fireballCost: 20
+--- !u!95 &-1751725848324459308
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2d5d3b645d30d1f468657d19c06f81d9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

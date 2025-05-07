@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using TMPro;
 
 public abstract class FighterBase : MonoBehaviour
@@ -23,6 +24,8 @@ public abstract class FighterBase : MonoBehaviour
 
     protected StatusEffectManager statusEffectManager;
 
+    public Animator animator;
+
     private void Awake()
     {
         statusEffectManager = GetComponent<StatusEffectManager>();
@@ -35,6 +38,8 @@ public abstract class FighterBase : MonoBehaviour
 
     private void Start()
     {
+        animator = GetComponent<Animator>();
+
         currentHealth = maxHealth;
         currentMana = maxMana;
         UpdateHpText();
@@ -71,7 +76,15 @@ public abstract class FighterBase : MonoBehaviour
     protected virtual void Die()
     {
         Debug.Log($"{fighterName} has died.");
-        Destroy(gameObject);
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.SetTrigger("DieTrigger");
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void UpdateHpText()
@@ -127,5 +140,20 @@ public abstract class FighterBase : MonoBehaviour
     public void ApplyStun(float stunDuration)
     {
         statusEffectManager?.ApplyStun(stunDuration);
+    }
+
+    public void PlayAttackAnimation()
+    {
+        animator.SetTrigger("AttackTrigger");
+    }
+
+    public void PlayDamageAnimation()
+    {
+        animator.SetTrigger("DamageTrigger");
+    }
+
+    public void PlayDeathAnimation()
+    {
+        Destroy(gameObject);
     }
 }

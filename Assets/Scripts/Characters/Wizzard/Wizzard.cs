@@ -1,5 +1,3 @@
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 
 public class Wizzard : FighterBase
@@ -20,6 +18,7 @@ public class Wizzard : FighterBase
     {
         statusEffectManager = GetComponent<StatusEffectManager>();
     }
+
     private void Update()
     {
         if (statusEffectManager.IsStunned()) return;
@@ -39,6 +38,7 @@ public class Wizzard : FighterBase
             }
         }
     }
+
     void ShootLightningBolt()
     {
         if (lightningBoltPrefab != null && firePoint != null)
@@ -80,6 +80,8 @@ public class Wizzard : FighterBase
             Debug.Log($"{fighterName} is stunned and cannot attack!");
             return;
         }
+
+        PlayAttackAnimation();
 
         int damage = baseAttackPower + 2;
         opponent.TakeDamage(damage);

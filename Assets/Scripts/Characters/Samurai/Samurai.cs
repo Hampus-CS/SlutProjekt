@@ -8,17 +8,21 @@ public class Samurai : FighterBase
     public float dashCooldown = 5f;
     public float knockbackForce = 5f;
     public float stunDuration = 0.5f;
-    private float lastDashTime = -Mathf.Infinity;
     public int dashDamage = 15;
 
+    private float lastDashTime = -Mathf.Infinity;
     private bool isDashing;
+    private bool isPerformingAbility;
     private Vector3 dashTarget;
-    
+
+    private Animator animator;
+
     private void Update()
     {
-        if (statusEffectManager.IsStunned()) return;
+        if (statusEffectManager.IsStunned() || isPerformingAbility) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastDashTime + dashCooldown && !isDashing)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastDashTime + dashCooldown && !isDashing &&
+            !isPerformingAbility)
         {
             StartDashPierce();
         }
@@ -38,7 +42,14 @@ public class Samurai : FighterBase
     private void StartDashPierce()
     {
         isDashing = true;
+        isPerformingAbility = true;
         lastDashTime = Time.time;
+
+        // Trigger animation
+        if (animator != null)
+        {
+            animator.SetTrigger("Ability");
+        }
 
         float direction = 1f;
         if (transform.localScale.x < 0)
@@ -74,6 +85,12 @@ public class Samurai : FighterBase
         }
     }
 
+    public void OnAbilityAnimationEnd()
+    {
+        isPerformingAbility = false;
+        Debug.Log("Ability animation finished.");
+    }
+
     public override void Attack(FighterBase opponent)
     {
         if (statusEffectManager != null && statusEffectManager.IsStunned())
@@ -81,6 +98,8 @@ public class Samurai : FighterBase
             Debug.Log($"{fighterName} is stunned and cannot attack!");
             return;
         }
+
+        PlayAttackAnimation();
 
         int damage = baseAttackPower + 5;
         opponent.TakeDamage(damage);

@@ -13,6 +13,8 @@ public class Warrior : FighterBase
             return;
         }
 
+        PlayAttackAnimation();
+
         int damage = baseAttackPower + 5;
         opponent.TakeDamage(damage);
         Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
