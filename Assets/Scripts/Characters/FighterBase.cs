@@ -18,7 +18,20 @@ public abstract class FighterBase : MonoBehaviour
     public float currentMana = 100f;
     public float manaRegenerationRate = 5f;
 
-    private StatusEffectManager statusEffectManager;
+    public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
+    public PlayerMove PlayerMove => GetComponent<PlayerMove>();
+
+    protected StatusEffectManager statusEffectManager;
+
+    private void Awake()
+    {
+        statusEffectManager = GetComponent<StatusEffectManager>();
+
+        if (statusEffectManager == null)
+        {
+            Debug.LogError("StatusEffectManager not found on " + gameObject.name);
+        }
+    }
 
     private void Start()
     {
@@ -27,7 +40,6 @@ public abstract class FighterBase : MonoBehaviour
         UpdateHpText();
         UpdateManaText();
 
-        statusEffectManager = GetComponent<StatusEffectManager>();
         if (statusEffectManager == null)
         {
             Debug.LogError("StatusEffectManager not found on " + gameObject.name);
@@ -94,10 +106,7 @@ public abstract class FighterBase : MonoBehaviour
         }
     }
 
-    protected bool HasEnoughMana(int amount)
-    {
-        return currentMana >= amount;
-    }
+    protected bool HasEnoughMana(int amount) => currentMana >= amount;
 
     protected void SpendMana(int amount)
     {
@@ -112,17 +121,11 @@ public abstract class FighterBase : MonoBehaviour
     // Status Effects
     public void ApplyBurn(int totalBurnDamage, float burnDuration)
     {
-        if (statusEffectManager != null)
-        {
-            statusEffectManager.ApplyBurn(totalBurnDamage, burnDuration);
-        }
+        statusEffectManager?.ApplyBurn(totalBurnDamage, burnDuration);
     }
 
     public void ApplyStun(float stunDuration)
     {
-        if (statusEffectManager != null)
-        {
-            statusEffectManager.ApplyStun(stunDuration);
-        }
+        statusEffectManager?.ApplyStun(stunDuration);
     }
 }

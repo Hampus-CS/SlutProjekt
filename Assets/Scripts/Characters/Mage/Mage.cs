@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using TMPro;
 
 public class Mage : FighterBase
 {
@@ -13,13 +12,6 @@ public class Mage : FighterBase
     private float lastFireballTime = -Mathf.Infinity;
     public int fireballCost = 20;
 
-    private StatusEffectManager statusEffectManager;
-
-
-    private void Start()
-    {
-        statusEffectManager = GetComponent<StatusEffectManager>();
-    }
     void Update()
     {
         if (statusEffectManager.IsStunned()) return;

@@ -1,16 +1,10 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class StatusEffectManager : MonoBehaviour
 {
     private FighterBase fighter;
-    private List<StatusEffect> activeEffects = new List<StatusEffect>();
-
-    private void Awake()
-    {
-        fighter = GetComponent<FighterBase>();
-    }
+    private List<StatusEffect> activeEffects = new();
 
     private void Update()
     {
@@ -28,14 +22,14 @@ public class StatusEffectManager : MonoBehaviour
 
     public void ApplyBurn(int totalBurnDamage, float duration)
     {
-        BurnEffect burn = new BurnEffect(duration, totalBurnDamage, fighter);
+        BurnEffect burn = new(duration, totalBurnDamage, fighter);
         activeEffects.Add(burn);
         burn.Start();
     }
 
     public void ApplyStun(float duration)
     {
-        StunEffect stun = new StunEffect(duration, fighter);
+        StunEffect stun = new(duration, fighter);
         activeEffects.Add(stun);
         stun.Start();
     }
@@ -47,18 +41,19 @@ public class StatusEffectManager : MonoBehaviour
             if (effect is StunEffect)
                 return true;
         }
+
         return false;
     }
 
     private abstract class StatusEffect
     {
         protected FighterBase fighter;
-        protected float duration;
+        private float duration;
         protected float elapsed;
 
         public bool IsFinished => elapsed >= duration;
 
-        public StatusEffect(float duration, FighterBase fighter)
+        protected StatusEffect(float duration, FighterBase fighter)
         {
             this.duration = duration;
             this.fighter = fighter;
@@ -77,15 +72,31 @@ public class StatusEffectManager : MonoBehaviour
         private float damagePerSecond;
         private float damageAccumulated;
 
+        private SpriteRenderer spriteRenderer;
+        private Color originalColor;
+        private float pulseSpeed = 4f;
+
         public BurnEffect(float duration, int totalBurnDamage, FighterBase fighter) : base(duration, fighter)
         {
-            this.totalBurnDamage = totalBurnDamage;
-            this.damagePerSecond = totalBurnDamage / duration;
-            this.damageAccumulated = 0f;
+            damagePerSecond = totalBurnDamage / duration;
+            damageAccumulated = 0f;
+
+            spriteRenderer = fighter.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                originalColor = spriteRenderer.color;
+            }
         }
 
         public override void Start()
         {
+            spriteRenderer = fighter.SpriteRenderer;
+
+            if (spriteRenderer != null)
+            {
+                originalColor = spriteRenderer.color;
+            }
+
             Debug.Log($"{fighter.fighterName} starts burning!");
         }
 
@@ -101,10 +112,23 @@ public class StatusEffectManager : MonoBehaviour
                 damageAccumulated -= damageToApply;
                 Debug.Log($"{fighter.fighterName} takes {damageToApply} burn damage!");
             }
+
+            // Pulse red overlay
+            if (spriteRenderer != null)
+            {
+                float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
+                Color burnColor = new Color(1f, 0f, 0f, 0.5f * pulse); // 50% opacity max
+                spriteRenderer.color = Color.Lerp(originalColor, burnColor, pulse);
+            }
         }
 
         public override void End()
         {
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = originalColor; // reset color
+            }
+
             Debug.Log($"{fighter.fighterName} burn effect ended.");
         }
     }
@@ -115,15 +139,24 @@ public class StatusEffectManager : MonoBehaviour
         private PlayerMove moveScript;
         private SpriteRenderer spriteRenderer;
         private Color originalColor;
+        private Color stunColor = new(0.6f, 0.8f, 1f, 1f);
 
-        public StunEffect(float duration, FighterBase fighter) : base(duration, fighter) { }
-
-        public override void Start()
+        public StunEffect(float duration, FighterBase fighter) : base(duration, fighter)
         {
             moveScript = fighter.GetComponent<PlayerMove>();
             spriteRenderer = fighter.GetComponent<SpriteRenderer>();
 
-            // Block movement and change color
+            if (spriteRenderer != null)
+            {
+                originalColor = spriteRenderer.color;
+            }
+        }
+
+        public override void Start()
+        {
+            moveScript = fighter.PlayerMove;
+            spriteRenderer = fighter.SpriteRenderer;
+
             if (moveScript != null)
             {
                 moveScript.BlockMovement(true);
@@ -132,7 +165,7 @@ public class StatusEffectManager : MonoBehaviour
             if (spriteRenderer != null)
             {
                 originalColor = spriteRenderer.color;
-                spriteRenderer.color = Color.blue;
+                spriteRenderer.color = stunColor;
             }
 
             Debug.Log($"{fighter.fighterName} is stunned!");
@@ -159,6 +192,4 @@ public class StatusEffectManager : MonoBehaviour
             Debug.Log($"{fighter.fighterName} stun effect ended.");
         }
     }
-
-
 }
