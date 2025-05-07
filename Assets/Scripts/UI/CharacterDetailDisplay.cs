@@ -1,42 +1,75 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
-public class CharacterDetailDisplay : CharacterCarouselSelector
+public class CharacterDetailDisplay : MonoBehaviour
 {
-    [Header("Image Slots")]
-    public Image portraitIdle;
-    public Image basicAttack;
-    public Image abilityAttack;
+    [Header("References")]
+    [SerializeField] private CharacterDetailCarouselSelector detailCarousel;
+    [SerializeField] private TMP_Text nameText;
+    [SerializeField] private TMP_Text titleText;
+    [SerializeField] private TMP_Text descriptionText;
+    [SerializeField] private Button backButton;
+    [SerializeField] private Button confirmButton;
 
-    [Header("Text Slots")]
-    public TMP_Text nameText;
-    public TMP_Text loreText;
-    public TMP_Text basicAttackText;
-    public TMP_Text abilityText;
-
-    void OnEnable()
+    private CharacterData currentData;
+    private int currentAspectIndex = 0;
+    
+    /// <summary>
+    /// Called by the manager when entering the detail panel.
+    /// </summary>
+    public void SetCharacter(CharacterData data)
     {
-        LoadCharacterDetails();
+        currentData = data;
+        //nameText.text  = data.displayName;
+        //titleText.text = data.title;
+
+        // Initialize the carousel with animations & fallbacks
+        detailCarousel.Initialize(
+            data.uiIdleAnimator,        data.fallbackIdleSprite,
+            data.uiBasicAttackAnimator, data.fallbackBasicAttackSprite,
+            data.uiAbilityAnimator,      data.fallbackAbilitySprite
+        );
+
+        // Subscribe to index changes
+        detailCarousel.OnDetailIndexChanged += OnAspectChanged;
+
+        // Wire buttons
+        backButton.onClick.RemoveAllListeners();
+        backButton.onClick.AddListener(() => OnBack?.Invoke());
+
+        confirmButton.onClick.RemoveAllListeners();
+        confirmButton.onClick.AddListener(() => OnConfirm?.Invoke(currentAspectIndex));
     }
 
-    void LoadCharacterDetails()
+    void OnDisable()
     {
-        CharacterData selected = CharacterDetailContext.SelectedCharacter;
+        // Unsubscribe when panel is hidden to avoid leaks
+        detailCarousel.OnDetailIndexChanged -= OnAspectChanged;
+    }
+    
+    // Event fired by this display when user wants to go back
+    public event Action OnBack;
+    // Event fired when user confirms; passes chosen aspect index (0=Idle,1=Basic,2=Ability)
+    public event Action<int> OnConfirm;
 
-        if (selected == null)
+    private void OnAspectChanged(int idx)
+    {
+        currentAspectIndex = idx;
+
+        // Update the description text based on aspect
+        switch (idx)
         {
-            Debug.LogError("No character selected!");
-            return;
+            case 0:
+                descriptionText.text = currentData.lore;
+                break;
+            case 1:
+                descriptionText.text = currentData.basicAttackDescription;
+                break;
+            case 2:
+                descriptionText.text = currentData.abilityDescription;
+                break;
         }
-
-        portraitIdle.sprite = selected.idleSprite;
-        basicAttack.sprite = selected.basicAttackSprite;
-        abilityAttack.sprite = selected.abilitySprite;
-
-        nameText.text = selected.displayName;
-        loreText.text = selected.lore;
-        basicAttackText.text = selected.basicAttackDescription;
-        abilityText.text = selected.abilityDescription;
     }
 }

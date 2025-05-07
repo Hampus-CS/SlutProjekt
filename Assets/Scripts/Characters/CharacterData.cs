@@ -5,19 +5,33 @@ using UnityEngine;
 public class CharacterData : ScriptableObject
 {
     [Header("Identity")]
-    public int id; // 0,1,2 : MUST be unique
+    [Tooltip("Unique numeric ID for this character. Must not collide with others.")]
+    public int id;
     public string displayName;
+    public string title;
+    
+    [Header("UI Animation Controllers")]
+    [Tooltip("AnimatorController for the animated idle pose in the carousel slots")]
+    public RuntimeAnimatorController uiIdleAnimator;
+    [Tooltip("AnimatorController for the animated basic‑attack preview in detail panel")]
+    public RuntimeAnimatorController uiBasicAttackAnimator;
+    [Tooltip("AnimatorController for the animated special‑ability preview in detail panel")]
+    public RuntimeAnimatorController uiAbilityAnimator;
+    
+    [Header("UI Sprites (fallback)")]
+    [Tooltip("Static sprite used only if no idle animation is assigned")]
+    public Sprite fallbackIdleSprite;
+    [Tooltip("Static sprite used only if no basic‑attack animation is assigned")]
+    public Sprite fallbackBasicAttackSprite;
+    [Tooltip("Static sprite used only if no ability animation is assigned")]
+    public Sprite fallbackAbilitySprite;
+
+    [Header("Descriptions")]
     [TextArea] public string lore;
     [TextArea] public string abilityDescription;
     [TextArea] public string basicAttackDescription;
-
-    [Header("Artwork")]
-    public Sprite idleSprite; // Carousel + main portrait
-    public Sprite basicAttackSprite;
-    public Sprite abilitySprite;
-
-    [Header("Gameplay")]
-    public GameObject fighterPrefab; // Prefab to spawn in the arena
-    public int maxHealth = 100; // For HUD preview, not used by code yet
-    public int attackPower = 10;
+    
+    [Header("In‑Game Prefab")]
+    [Tooltip("The prefab instantiated when the match starts")]
+    public GameObject fighterPrefab;
 }
