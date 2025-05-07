@@ -14,6 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   displayName: Garok, The Iron Guardian
+  title: 
+  uiIdleAnimator: {fileID: 0}
+  uiBasicAttackAnimator: {fileID: 0}
+  uiAbilityAnimator: {fileID: 0}
+  fallbackIdleSprite: {fileID: -7385789195546760866, guid: 132f4daf730951446901a088507d394b, type: 3}
+  fallbackBasicAttackSprite: {fileID: 6934013284892070054, guid: 03f4052699156eb429aaa65d26a1f15e, type: 3}
+  fallbackAbilitySprite: {fileID: 7441861488978599509, guid: 2489416ea4859aa4c94631e69f00da0f, type: 3}
   lore: Garok hails from the rugged highlands, where conflict was life and survival
     meant mastering combat. His unmatched strength and valor made him a legend among
     warriors, but betrayal by his clan forced him into exile. Arriving in urban battlegrounds
@@ -23,9 +30,4 @@ MonoBehaviour:
     inspiring awe and dread in every fight he enters.
   abilityDescription: Ability Description Placeholder
   basicAttackDescription: Basic Attack Description Placeholder
-  idleSprite: {fileID: 0}
-  basicAttackSprite: {fileID: 0}
-  abilitySprite: {fileID: 0}
   fighterPrefab: {fileID: 5251138399461381211, guid: ebf9e54ac9d512e4399b1af2080fe7ef, type: 3}
-  maxHealth: 100
-  attackPower: 10

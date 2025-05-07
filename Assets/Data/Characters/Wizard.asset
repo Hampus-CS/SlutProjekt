@@ -14,6 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 3
   displayName: Raizel, The Storm Sage
+  title: 
+  uiIdleAnimator: {fileID: 0}
+  uiBasicAttackAnimator: {fileID: 0}
+  uiAbilityAnimator: {fileID: 0}
+  fallbackIdleSprite: {fileID: 4723107735738678597, guid: 0aecbd3fe0ad14542990cdebcc57f2cf, type: 3}
+  fallbackBasicAttackSprite: {fileID: 4976274401295337057, guid: 51799efde9d71e94cb32828d8af1f844, type: 3}
+  fallbackAbilitySprite: {fileID: 9220252021294270350, guid: bb788b95a0b598843a413173b20a30ba, type: 3}
   lore: Raizel, once a respected scholar within the mystical citadel of Arkalis,
     spent decades studying the chaotic power of storms. After a disastrous experiment
     to harness lightning itself resulted in the destruction of his beloved academy,
@@ -24,9 +31,4 @@ MonoBehaviour:
     title "Storm Sage."
   abilityDescription: Ability Description Placeholder
   basicAttackDescription: Basic Attack Description Placeholder
-  idleSprite: {fileID: 4723107735738678597, guid: 35e9a656a25934d438da17f89d3c4c77, type: 3}
-  basicAttackSprite: {fileID: 6934013284892070054, guid: 62244c0f0e3ed4f4696cc63b1ede0915, type: 3}
-  abilitySprite: {fileID: 9220252021294270350, guid: bb788b95a0b598843a413173b20a30ba, type: 3}
   fighterPrefab: {fileID: 5251138399461381211, guid: 55797f11487b8a849816cafa58f3cc84, type: 3}
-  maxHealth: 100
-  attackPower: 10
