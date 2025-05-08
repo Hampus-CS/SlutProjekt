@@ -13,7 +13,7 @@ public class Wizzard : FighterBase
     public int lightningBoltCost = 30;
 
     private StatusEffectManager statusEffectManager;
-
+    
     private void Start()
     {
         statusEffectManager = GetComponent<StatusEffectManager>();
@@ -41,6 +41,11 @@ public class Wizzard : FighterBase
 
     void ShootLightningBolt()
     {
+        if (animator != null)
+        {
+            animator.SetTrigger("Ability");
+        }
+        
         if (lightningBoltPrefab != null && firePoint != null)
         {
             GameObject lightningBolt = Instantiate(lightningBoltPrefab, firePoint.position, Quaternion.identity);

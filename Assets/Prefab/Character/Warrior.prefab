@@ -47,7 +47,8 @@ GameObject:
   - component: {fileID: 7860834423221356869}
   - component: {fileID: 2896229071126493811}
   - component: {fileID: 4224143124111838119}
-  - component: {fileID: 8656149867966757604}
+  - component: {fileID: 5807196996084791133}
+  - component: {fileID: -7869769267071393051}
   m_Layer: 7
   m_Name: Warrior
   m_TagString: Player
@@ -305,7 +306,7 @@ MonoBehaviour:
   groundCheck: {fileID: 7860158761740945772}
   groundCheckRadius: 0.6
   isMovementBlocked: 0
---- !u!114 &8656149867966757604
+--- !u!114 &5807196996084791133
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -317,18 +318,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c912afda85127946a8d219aa85ddb73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fighterName: Warrior
+  fighterName: Fighter
   baseAttackPower: 10
   currentHealth: 0
   maxHealth: 100
   hpText: {fileID: 0}
   manaText: {fileID: 0}
   maxMana: 100
-  currentMana: 0
+  currentMana: 100
   manaRegenerationRate: 5
-  dashDistance: 3
-  dashSpeed: 10
-  dashCooldown: 5
-  knockbackForce: 5
-  stunDuration: 0.5
-  dashDamage: 15
+  animator: {fileID: -7869769267071393051}
+--- !u!95 &-7869769267071393051
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 56d86359640aa5a46bc0ed0c0407af30, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 public abstract class FighterBase : MonoBehaviour
@@ -142,7 +141,7 @@ public abstract class FighterBase : MonoBehaviour
         statusEffectManager?.ApplyStun(stunDuration);
     }
 
-    public void PlayAttackAnimation()
+    protected void PlayAttackAnimation()
     {
         animator.SetTrigger("AttackTrigger");
     }
