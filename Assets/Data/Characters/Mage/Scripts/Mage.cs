@@ -4,6 +4,8 @@ public class Mage : FighterBase
 {
     [Header("Mage Settings")]
     public GameObject fireballPrefab;
+    public GameObject magicBoltPrefab;
+    public float magicBoltSpeed = 5f;
     public Transform firePoint;
 
     [Header("Fireball Settings")]
@@ -11,6 +13,8 @@ public class Mage : FighterBase
     public float fireballCooldown = 5f;
     private float lastFireballTime = -Mathf.Infinity;
     public int fireballCost = 20;
+    
+    
 
     void Update()
     {
@@ -71,8 +75,33 @@ public class Mage : FighterBase
 
         PlayAttackAnimation();
 
-        int damage = baseAttackPower + 2;
-        opponent.TakeDamage(damage);
+        if (magicBoltPrefab != null && firePoint != null)
+        {
+            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, Quaternion.identity);
+            Rigidbody2D rb = bolt.GetComponent<Rigidbody2D>();
+
+            float direction;
+            if (transform.localScale.x < 0)
+            {
+                direction = 1f;
+            }
+            else
+            {
+                direction = -1f;
+            }
+            
+            rb.linearVelocity = new Vector2(direction * magicBoltSpeed, 0f);
+            
+            MagicBolt boltScript = bolt.GetComponent<MagicBolt>();
+            if (boltScript != null)
+            {
+                boltScript.damage = baseAttackPower + 2;
+                boltScript.SetOwner(gameObject);
+            }
+
+            Debug.Log($"{fighterName} fires a magic bolt!");
+        }
+        
         Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
     }
 }

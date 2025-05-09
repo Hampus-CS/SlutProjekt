@@ -47,7 +47,7 @@ public class PlayerMove : NetworkBehaviour
         if (isDashing) return;
         if (isMovementBlocked) return;
 
-        // Handling movement direction
+        // Handling a movement direction
         bool movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
 
@@ -78,13 +78,13 @@ public class PlayerMove : NetworkBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
-        // Dash (only if there is movement direction)
+        // Dash (only if there is a movement direction)
         if (Input.GetKeyDown(KeyCode.LeftShift) && moveDirection != Vector2.zero)
         {
             StartDash();
         }
 
-        // Flip player based on movement direction
+        // Flip player based on a movement direction
         if (movingLeft)
         {
             FlipPlayer(true);

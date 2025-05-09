@@ -37,8 +37,6 @@ public abstract class FighterBase : MonoBehaviour
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
-
         currentHealth = maxHealth;
         currentMana = maxMana;
         UpdateHpText();

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c07c979d4c7ebe147972283c4c17cc44, type: 3}
+  m_Name: Samurai
+  m_EditorClassIdentifier: 
+  id: 4
+  displayName: 
+  title: 
+  uiIdleAnimator: {fileID: 0}
+  uiBasicAttackAnimator: {fileID: 0}
+  uiAbilityAnimator: {fileID: 0}
+  fallbackIdleSprite: {fileID: 0}
+  fallbackBasicAttackSprite: {fileID: 0}
+  fallbackAbilitySprite: {fileID: 0}
+  lore: 
+  abilityDescription: Ability Description Placeholder
+  basicAttackDescription: Basic Attack Description Placeholder
+  fighterPrefab: {fileID: 0}
