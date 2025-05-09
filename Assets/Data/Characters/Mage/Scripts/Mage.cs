@@ -78,30 +78,10 @@ public class Mage : FighterBase
         if (magicBoltPrefab != null && firePoint != null)
         {
             GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, Quaternion.identity);
-            Rigidbody2D rb = bolt.GetComponent<Rigidbody2D>();
-
-            float direction;
-            if (transform.localScale.x < 0)
-            {
-                direction = 1f;
-            }
-            else
-            {
-                direction = -1f;
-            }
             
-            rb.linearVelocity = new Vector2(direction * magicBoltSpeed, 0f);
             
-            MagicBolt boltScript = bolt.GetComponent<MagicBolt>();
-            if (boltScript != null)
-            {
-                boltScript.damage = baseAttackPower + 2;
-                boltScript.SetOwner(gameObject);
-            }
-
-            Debug.Log($"{fighterName} fires a magic bolt!");
         }
-        
-        Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
+
     }
+
 }

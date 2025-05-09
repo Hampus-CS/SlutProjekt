@@ -68,6 +68,7 @@ public abstract class FighterBase : MonoBehaviour
         UpdateHpText();
     }
 
+    
     public abstract void Attack(FighterBase opponent);
 
     protected virtual void Die()
