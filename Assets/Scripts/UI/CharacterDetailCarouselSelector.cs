@@ -18,7 +18,10 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
     [Tooltip("Seconds between allowed scrolls")]
     [SerializeField] private float scrollCooldown = 0.3f;
 
-    private RuntimeAnimatorController[] animControllers;
+    [Header("Generic Slot Controller")]
+    [SerializeField] private RuntimeAnimatorController slotBaseController;
+    
+    private AnimationClip[] clips;
     private Sprite[] fallbackSprites;
     private int selectedIndex;
     private bool canScroll = true;
@@ -33,11 +36,11 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
     /// Call this from CharacterDetailDisplay.SetCharacter(...).
     /// </summary>
     public void Initialize(
-        RuntimeAnimatorController idleAnim, Sprite idleFallback,
-        RuntimeAnimatorController basicAnim, Sprite basicFallback,
-        RuntimeAnimatorController abilityAnim, Sprite abilityFallback)
+        AnimationClip idleClip,   Sprite idleFallback,
+        AnimationClip basicClip,  Sprite basicFallback,
+        AnimationClip abilityClip,Sprite abilityFallback)
     {
-        animControllers = new[] { idleAnim, basicAnim, abilityAnim };
+        clips = new[] { idleClip, basicClip, abilityClip };
         fallbackSprites = new[]  { idleFallback, basicFallback, abilityFallback };
         selectedIndex = 0;
         UpdateSlots(instant: true);
@@ -77,28 +80,34 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
 
     private void UpdateSlots(bool instant)
     {
-        ApplySlot(portraitSlotImage, portraitSlotAnimator, animControllers[0], fallbackSprites[0], selectedIndex == 0, instant);
-        ApplySlot(basicSlotImage,    basicSlotAnimator,    animControllers[1], fallbackSprites[1], selectedIndex == 1, instant);
-        ApplySlot(abilitySlotImage,  abilitySlotAnimator,  animControllers[2], fallbackSprites[2], selectedIndex == 2, instant);
+        int count = clips.Length;
+        int left  = (selectedIndex - 1 + count) % count;
+        int right = (selectedIndex + 1)        % count;
+        
+        ApplySlot(portraitSlotImage, portraitSlotAnimator, clips[left], fallbackSprites[left],  false, instant);
+        ApplySlot(basicSlotImage,    basicSlotAnimator,    clips[selectedIndex], fallbackSprites[selectedIndex], true,  instant);
+        ApplySlot(abilitySlotImage,  abilitySlotAnimator,  clips[right], fallbackSprites[right], false, instant);
     }
 
-    private void ApplySlot(
-        Image img,
-        Animator animator,
-        RuntimeAnimatorController controller,
-        Sprite fallback,
-        bool isCenter,
-        bool instant)
+    private void ApplySlot(Image img, Animator animator, AnimationClip clip,Sprite fallback, bool isCenter, bool instant)
     {
         // assign animation or fallback
-        if (controller != null)
-            animator.runtimeAnimatorController = controller;
+        if (clip != null)
+        {
+            var overrideCtrl = new AnimatorOverrideController(slotBaseController);
+            overrideCtrl["Loop"] = clip;
+            animator.runtimeAnimatorController = overrideCtrl;
+        }
         else
+        {
+            // stop animating so the Image.sprite shows
+            animator.runtimeAnimatorController = null;
+            animator.enabled = false;
             img.sprite = fallback;
-
+        }
         // style: center vs side
         float targetAlpha = isCenter ? 1f : 0.5f;
-        float targetScale = isCenter ? 1.2f : 0.8f;
+        float targetScale = isCenter ? 1.2f : 0.8f; 
 
         var group = img.GetComponent<CanvasGroup>();
         if (instant)

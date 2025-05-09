@@ -9,7 +9,7 @@ public class CharacterCarouselSelector : MonoBehaviour
 {
     [Header("Character Data List")]
     [SerializeField] private List<CharacterData> characters;
-
+    
     [Header("UI References")]
     [SerializeField] private Image slotLeftImage;
     [SerializeField] private Animator slotLeftAnimator;
@@ -29,6 +29,10 @@ public class CharacterCarouselSelector : MonoBehaviour
     public float centerAlpha = 1f;
     [Tooltip("Scale of selected (center) slot")]
     public float centerScale = 1.2f;
+    
+    [Header("Generic Slot Controller")]
+    [Tooltip("AnimatorController with one state named 'Loop'")]
+    [SerializeField] private RuntimeAnimatorController slotBaseController;
     
     [SerializeField] private int selectedIndex = 0;
     private bool canScroll = true;
@@ -81,20 +85,23 @@ public class CharacterCarouselSelector : MonoBehaviour
         int count = characters.Count;
         int leftIndex = (selectedIndex - 1 + count) % count;
         int rightIndex = (selectedIndex + 1) % count;
+        
+        ApplySlot(slotLeftImage, slotLeftAnimator, characters[leftIndex].uiIdleClip, characters[leftIndex].fallbackIdleSprite, sideAlpha, sideScale, instant);
 
-        ApplySlot(slotLeftImage, slotLeftAnimator, characters[leftIndex].uiIdleAnimator, characters[leftIndex].fallbackIdleSprite, sideAlpha, sideScale, instant);
-        
-        ApplySlot(slotCenterImage, slotCenterAnimator, characters[selectedIndex].uiIdleAnimator, characters[selectedIndex].fallbackIdleSprite, centerAlpha, centerScale, instant);
-        
+        ApplySlot(slotCenterImage, slotCenterAnimator, characters[selectedIndex].uiIdleClip, characters[selectedIndex].fallbackIdleSprite,centerAlpha, centerScale, instant);
+
+        ApplySlot(slotRightImage, slotRightAnimator, characters[rightIndex].uiIdleClip, characters[rightIndex].fallbackIdleSprite, sideAlpha, sideScale, instant);
     }
 
-    void ApplySlot(Image img, Animator animator, RuntimeAnimatorController animController, Sprite fallback, float targetAlpha, float targetScale, bool instant)
+    void ApplySlot(Image img, Animator animator, AnimationClip clip, Sprite fallback, float targetAlpha, float targetScale, bool instant)
     {
     
         // assign animation or fallback sprite
-        if (animController != null)
+        if (clip != null)
         {
-            animator.runtimeAnimatorController = animController;
+            var overrideCtrl = new AnimatorOverrideController(slotBaseController);
+            overrideCtrl["Loop"] = clip;
+            animator.runtimeAnimatorController = overrideCtrl;
         }
         else
         {
