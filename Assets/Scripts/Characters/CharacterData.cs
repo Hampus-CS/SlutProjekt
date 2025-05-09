@@ -10,13 +10,10 @@ public class CharacterData : ScriptableObject
     public string displayName;
     public string title;
     
-    [Header("UI Animation Controllers")]
-    [Tooltip("AnimatorController for the animated idle pose in the carousel slots")]
-    public RuntimeAnimatorController uiIdleAnimator;
-    [Tooltip("AnimatorController for the animated basic‑attack preview in detail panel")]
-    public RuntimeAnimatorController uiBasicAttackAnimator;
-    [Tooltip("AnimatorController for the animated special‑ability preview in detail panel")]
-    public RuntimeAnimatorController uiAbilityAnimator;
+    [Header("UI Animation Clips")]
+    public AnimationClip uiIdleClip;
+    public AnimationClip uiBasicAttackClip;
+    public AnimationClip uiAbilityClip;
     
     [Header("UI Sprites (fallback)")]
     [Tooltip("Static sprite used only if no idle animation is assigned")]

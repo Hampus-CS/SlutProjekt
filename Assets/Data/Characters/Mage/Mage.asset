@@ -14,6 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1
   displayName: Sylvara, Flame Seer
+  title: 
+  uiIdleClip: {fileID: 7400000, guid: 2a6317d3749059249bc3fb82fabdaddc, type: 2}
+  uiBasicAttackClip: {fileID: 7400000, guid: fe2a1ff8d80ab2748b07eac51d66f31d, type: 2}
+  uiAbilityClip: {fileID: 7400000, guid: fe2a1ff8d80ab2748b07eac51d66f31d, type: 2}
+  fallbackIdleSprite: {fileID: -7385789195546760866, guid: a141fb363b48ba04e9111478ce2d5cc0, type: 3}
+  fallbackBasicAttackSprite: {fileID: -7008412969330441016, guid: 11efd2944d96c1f4885f89e46fb894cd, type: 3}
+  fallbackAbilitySprite: {fileID: -2238382357930459393, guid: 11efd2944d96c1f4885f89e46fb894cd, type: 3}
   lore: Born amidst the volcanic spires of the distant Ember Isles, Sylvara possessed
     an innate affinity for fire magic. Shunned by villagers fearful of her uncontrollable
     powers, she traveled from city to city, hiding among the crowded slums. Street
@@ -23,9 +30,4 @@ MonoBehaviour:
     "Flame Seer."
   abilityDescription: Ability Description Placeholder
   basicAttackDescription: Basic Attack Description Placeholder
-  idleSprite: {fileID: 4723107735738678597, guid: a141fb363b48ba04e9111478ce2d5cc0, type: 3}
-  basicAttackSprite: {fileID: -7008412969330441016, guid: 11efd2944d96c1f4885f89e46fb894cd, type: 3}
-  abilitySprite: {fileID: 460462634867118153, guid: 11efd2944d96c1f4885f89e46fb894cd, type: 3}
   fighterPrefab: {fileID: 5251138399461381211, guid: 897db42b462e1304ba1b7313c7216ece, type: 3}
-  maxHealth: 100
-  attackPower: 10
