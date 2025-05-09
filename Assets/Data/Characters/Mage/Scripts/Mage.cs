@@ -4,9 +4,6 @@ public class Mage : FighterBase
 {
     [Header("Mage Settings")]
     public GameObject fireballPrefab;
-    public GameObject magicBoltPrefab;
-    public float magicBoltSpeed = 5f;
-    public Transform firePoint;
 
     [Header("Fireball Settings")]
     public float fireballSpeed = 10f;
@@ -14,8 +11,8 @@ public class Mage : FighterBase
     private float lastFireballTime = -Mathf.Infinity;
     public int fireballCost = 20;
     
+    private StatusEffectManager statusEffectManager;
     
-
     void Update()
     {
         if (statusEffectManager.IsStunned()) return;
@@ -73,15 +70,10 @@ public class Mage : FighterBase
             return;
         }
 
-        PlayAttackAnimation();
-
-        if (magicBoltPrefab != null && firePoint != null)
+        if (Input.GetMouseButtonDown(0))
         {
-            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, Quaternion.identity);
-            
-            
+            PlayAttackAnimation();
+            ShootProjectile();
         }
-
     }
-
 }

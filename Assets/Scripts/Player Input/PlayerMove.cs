@@ -50,6 +50,9 @@ public class PlayerMove : NetworkBehaviour
         // Handling a movement direction
         bool movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+        
+        //  Update animation for movement
+        animator.SetBool("isMoving", moveDirection != Vector2.zero && isGrounded);
 
         if (movingLeft)
         {
@@ -69,8 +72,6 @@ public class PlayerMove : NetworkBehaviour
             moveDirection = Vector2.zero; // No movement if neither is pressed
         }
 
-        //  Update animation for movement
-        animator.SetBool("isMoving", moveDirection != Vector2.zero && isGrounded);
 
         // Jump (only if grounded)
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)

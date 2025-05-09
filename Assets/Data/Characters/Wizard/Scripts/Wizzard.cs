@@ -4,7 +4,6 @@ public class Wizzard : FighterBase
 {
     [Header("Wizzard Settings")]
     public GameObject lightningBoltPrefab;
-    public Transform firePoint;
 
     [Header("Lightning Bolt")]
     public float lightningBoltSpeed = 15f;
@@ -12,7 +11,6 @@ public class Wizzard : FighterBase
     private float lastLightningBoltTime = -Mathf.Infinity;
     public int lightningBoltCost = 30;
 
-    private StatusEffectManager statusEffectManager;
     
     private void Start()
     {
@@ -87,8 +85,6 @@ public class Wizzard : FighterBase
         }
 
         PlayAttackAnimation();
-
-        int damage = baseAttackPower + 2;
-        opponent.TakeDamage(damage);
+        ShootProjectile();
     }
 }

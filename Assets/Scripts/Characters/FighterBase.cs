@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using TMPro;
 
 public abstract class FighterBase : MonoBehaviour
@@ -18,6 +19,11 @@ public abstract class FighterBase : MonoBehaviour
     public float currentMana = 100f;
     public float manaRegenerationRate = 5f;
 
+    [Header("Projectile")]
+    public GameObject magicBoltPrefab;
+    public Transform firePoint;
+    public float projectileSpeed = 10f;
+    
     public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
     public PlayerMove PlayerMove => GetComponent<PlayerMove>();
 
@@ -25,14 +31,10 @@ public abstract class FighterBase : MonoBehaviour
 
     public Animator animator;
 
+   
     private void Awake()
     {
-        statusEffectManager = GetComponent<StatusEffectManager>();
-
-        if (statusEffectManager == null)
-        {
-            Debug.LogError("StatusEffectManager not found on " + gameObject.name);
-        }
+        
     }
 
     private void Start()
@@ -41,6 +43,8 @@ public abstract class FighterBase : MonoBehaviour
         currentMana = maxMana;
         UpdateHpText();
         UpdateManaText();
+        
+        statusEffectManager = GetComponent<StatusEffectManager>();
 
         if (statusEffectManager == null)
         {
@@ -53,6 +57,23 @@ public abstract class FighterBase : MonoBehaviour
         RegenerateMana();
         UpdateHpText();
         UpdateManaText();
+    }
+
+    protected void ShootProjectile()
+    {
+        if (magicBoltPrefab != null && firePoint != null)
+        {
+            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, firePoint.rotation);
+
+            Rigidbody2D rb = bolt.GetComponent<Rigidbody2D>();
+
+            if (rb != null)
+            {
+                rb.linearVelocity = firePoint.right * projectileSpeed;
+            }
+
+            Debug.Log($"{gameObject.name} shoots a magic bolt!");
+        }
     }
 
     public virtual void TakeDamage(int amount)
