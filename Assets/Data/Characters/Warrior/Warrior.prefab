@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 2896229071126493811}
   - component: {fileID: 4224143124111838119}
   - component: {fileID: 5807196996084791133}
+  - component: {fileID: -5563717477408993157}
   - component: {fileID: -7869769267071393051}
   m_Layer: 7
   m_Name: Warrior
@@ -327,7 +328,22 @@ MonoBehaviour:
   maxMana: 100
   currentMana: 100
   manaRegenerationRate: 5
-  animator: {fileID: -7869769267071393051}
+  magicBoltPrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  projectileSpeed: 10
+  critDuration: 5
+--- !u!114 &-5563717477408993157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4ecb38cea214c43965e63d518d0d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &-7869769267071393051
 Animator:
   serializedVersion: 7

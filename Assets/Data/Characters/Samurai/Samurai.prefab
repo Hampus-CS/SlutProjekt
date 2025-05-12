@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 4224143124111838119}
   - component: {fileID: 2896229071126493811}
   - component: {fileID: -1754342446451224459}
+  - component: {fileID: -340417913016091511}
   - component: {fileID: 4955429153749637834}
   m_Layer: 7
   m_Name: Samurai
@@ -327,13 +328,27 @@ MonoBehaviour:
   maxMana: 100
   currentMana: 100
   manaRegenerationRate: 5
-  animator: {fileID: 4955429153749637834}
+  magicBoltPrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  projectileSpeed: 10
   dashDistance: 5
   dashSpeed: 10
   dashCooldown: 5
   knockbackForce: 5
   stunDuration: 0.5
   dashDamage: 15
+--- !u!114 &-340417913016091511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4ecb38cea214c43965e63d518d0d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &4955429153749637834
 Animator:
   serializedVersion: 7

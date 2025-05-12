@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 4224143124111838119}
   - component: {fileID: 2896229071126493811}
   - component: {fileID: 3961873973479769640}
+  - component: {fileID: -8423234032183531811}
   - component: {fileID: 5941801368839311145}
   m_Layer: 7
   m_Name: Wizard
@@ -331,12 +332,22 @@ MonoBehaviour:
   magicBoltPrefab: {fileID: 0}
   firePoint: {fileID: 0}
   projectileSpeed: 10
-  animator: {fileID: 5941801368839311145}
   lightningBoltPrefab: {fileID: 0}
-  firePoint: {fileID: 0}
   lightningBoltSpeed: 15
   lightningBoltCooldown: 3
   lightningBoltCost: 30
+--- !u!114 &-8423234032183531811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5251138399461381211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4ecb38cea214c43965e63d518d0d7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &5941801368839311145
 Animator:
   serializedVersion: 7

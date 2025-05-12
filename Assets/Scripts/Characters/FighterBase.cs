@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 public abstract class FighterBase : MonoBehaviour
@@ -27,24 +26,18 @@ public abstract class FighterBase : MonoBehaviour
     public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
     public PlayerMove PlayerMove => GetComponent<PlayerMove>();
 
+    protected Animator animator;
     protected StatusEffectManager statusEffectManager;
-
-    public Animator animator;
-
    
-    private void Awake()
-    {
-        
-    }
-
     private void Start()
     {
+        animator = GetComponent<Animator>();
+        statusEffectManager = GetComponent<StatusEffectManager>();
+        
         currentHealth = maxHealth;
         currentMana = maxMana;
         UpdateHpText();
         UpdateManaText();
-        
-        statusEffectManager = GetComponent<StatusEffectManager>();
 
         if (statusEffectManager == null)
         {
@@ -61,6 +54,7 @@ public abstract class FighterBase : MonoBehaviour
 
     protected void ShootProjectile()
     {
+        Debug.Log("Shoot");
         if (magicBoltPrefab != null && firePoint != null)
         {
             GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, firePoint.rotation);
@@ -69,15 +63,25 @@ public abstract class FighterBase : MonoBehaviour
 
             if (rb != null)
             {
-                rb.linearVelocity = firePoint.right * projectileSpeed;
+                float direction = 1f;
+                if (transform.localScale.x < 0)
+                {
+                    direction = -1f;
+                }
+                rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
             }
 
             Debug.Log($"{gameObject.name} shoots a magic bolt!");
+        }
+        else
+        {
+            Debug.LogError("Magic bolt prefab or firePoint is missing.");
         }
     }
 
     public virtual void TakeDamage(int amount)
     {
+        PlayDamageAnimation();
         currentHealth -= amount;
 
         if (currentHealth <= 0)
@@ -89,16 +93,14 @@ public abstract class FighterBase : MonoBehaviour
         UpdateHpText();
     }
 
-    
     public abstract void Attack(FighterBase opponent);
 
     protected virtual void Die()
     {
         Debug.Log($"{fighterName} has died.");
-        Animator animator = GetComponent<Animator>();
         if (animator != null)
         {
-            animator.SetTrigger("DieTrigger");
+            PlayDeathAnimation();
         }
         else
         {
@@ -166,13 +168,14 @@ public abstract class FighterBase : MonoBehaviour
         animator.SetTrigger("AttackTrigger");
     }
 
-    public void PlayDamageAnimation()
+    private void PlayDamageAnimation()
     {
         animator.SetTrigger("DamageTrigger");
     }
 
-    public void PlayDeathAnimation()
+    private void PlayDeathAnimation()
     {
+        animator.SetTrigger("DeathTrigger");
         Destroy(gameObject);
     }
 }

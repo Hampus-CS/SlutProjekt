@@ -2,26 +2,23 @@
 
 public class Mage : FighterBase
 {
-    [Header("Mage Settings")]
-    public GameObject fireballPrefab;
 
     [Header("Fireball Settings")]
+    public GameObject fireballPrefab;
     public float fireballSpeed = 10f;
     public float fireballCooldown = 5f;
-    private float lastFireballTime = -Mathf.Infinity;
     public int fireballCost = 20;
-    
-    private StatusEffectManager statusEffectManager;
+    private float lastFireballTime = -Mathf.Infinity;
     
     void Update()
     {
-        if (statusEffectManager.IsStunned()) return;
-
+        if (statusEffectManager.IsStunned()) return;    
+        
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastFireballTime + fireballCooldown)
         {
             if (HasEnoughMana(fireballCost))
             {
-                ShootFireball();
+                ShootFireball();    
                 SpendMana(fireballCost);
                 lastFireballTime = Time.time;
             }
@@ -29,6 +26,11 @@ public class Mage : FighterBase
             {
                 Debug.Log("Not enough mana!");
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+         Attack(null);   
         }
     }
 
@@ -64,16 +66,15 @@ public class Mage : FighterBase
 
     public override void Attack(FighterBase opponent)
     {
+        Debug.Log($"{fighterName} attacks!");
         if (statusEffectManager != null && statusEffectManager.IsStunned())
         {
             Debug.Log($"{fighterName} is stunned and cannot attack!");
             return;
         }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            PlayAttackAnimation();
-            ShootProjectile();
-        }
+        
+        PlayAttackAnimation();
+        Debug.Log($"{fighterName} attacks!");
+        ShootProjectile();
     }
 }

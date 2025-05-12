@@ -11,12 +11,6 @@ public class Wizzard : FighterBase
     private float lastLightningBoltTime = -Mathf.Infinity;
     public int lightningBoltCost = 30;
 
-    
-    private void Start()
-    {
-        statusEffectManager = GetComponent<StatusEffectManager>();
-    }
-
     private void Update()
     {
         if (statusEffectManager.IsStunned()) return;

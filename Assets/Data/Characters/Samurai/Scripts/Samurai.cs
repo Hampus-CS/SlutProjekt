@@ -14,11 +14,7 @@ public class Samurai : FighterBase
     private bool isDashing;
     private bool isPerformingAbility;
     private Vector3 dashTarget;
-
-    private void Start()
-    {
-        animator = GetComponent<Animator>();
-    }
+    
     private void Update()
     {
         if (statusEffectManager.IsStunned() || isPerformingAbility) return;

@@ -49,7 +49,7 @@ public class StatusEffectManager : MonoBehaviour
     {
         protected FighterBase fighter;
         private float duration;
-        protected float elapsed;
+        private float elapsed;
 
         public bool IsFinished => elapsed >= duration;
 
@@ -61,7 +61,12 @@ public class StatusEffectManager : MonoBehaviour
         }
 
         public abstract void Start();
-        public abstract void UpdateEffect(float deltaTime);
+
+        public virtual void UpdateEffect(float deltaTime)
+        {
+            elapsed += deltaTime;
+        }
+
         public abstract void End();
     }
 
@@ -102,7 +107,7 @@ public class StatusEffectManager : MonoBehaviour
 
         public override void UpdateEffect(float deltaTime)
         {
-            elapsed += deltaTime;
+            base.UpdateEffect(deltaTime);
             damageAccumulated += damagePerSecond * deltaTime;
 
             if (damageAccumulated >= 1f)
@@ -113,11 +118,10 @@ public class StatusEffectManager : MonoBehaviour
                 Debug.Log($"{fighter.fighterName} takes {damageToApply} burn damage!");
             }
 
-            // Pulse red overlay
             if (spriteRenderer != null)
             {
                 float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
-                Color burnColor = new Color(1f, 0f, 0f, 0.5f * pulse); // 50% opacity max
+                Color burnColor = new Color(1f, 0f, 0f, 0.5f * pulse);
                 spriteRenderer.color = Color.Lerp(originalColor, burnColor, pulse);
             }
         }
@@ -126,7 +130,7 @@ public class StatusEffectManager : MonoBehaviour
         {
             if (spriteRenderer != null)
             {
-                spriteRenderer.color = originalColor; // reset color
+                spriteRenderer.color = originalColor;
             }
 
             Debug.Log($"{fighter.fighterName} burn effect ended.");
@@ -173,12 +177,11 @@ public class StatusEffectManager : MonoBehaviour
 
         public override void UpdateEffect(float deltaTime)
         {
-            elapsed += deltaTime;
+            base.UpdateEffect(deltaTime);
         }
 
         public override void End()
         {
-            // Reset color and unblock movement
             if (moveScript != null)
             {
                 moveScript.BlockMovement(false);

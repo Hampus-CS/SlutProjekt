@@ -7,15 +7,12 @@ public class Warrior : FighterBase
 {
     private bool isCritActive;
     private float critTimer;
-    private float critDuration = 5f;
-    
-    private void Start()
-    {
-        animator = GetComponent<Animator>();
-    }
+    public float critDuration = 5f;
     
     private void Update()
     {
+        if(statusEffectManager.IsStunned()) return;
+        
         if(Input.GetKeyDown((KeyCode.Space)))
         {
             Crit();
