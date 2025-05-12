@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Wizzard : FighterBase
+public class Wizard : FighterBase
 {
     [Header("Wizzard Settings")]
     public GameObject lightningBoltPrefab;
@@ -8,12 +8,12 @@ public class Wizzard : FighterBase
     [Header("Lightning Bolt")]
     public float lightningBoltSpeed = 15f;
     public float lightningBoltCooldown = 3f;
-    private float lastLightningBoltTime = -Mathf.Infinity;
     public int lightningBoltCost = 30;
+    private float lastLightningBoltTime = -Mathf.Infinity;
 
     private void Update()
     {
-        if (statusEffectManager.IsStunned()) return;
+        if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
 
         // Lightning bolt cooldown and mana check
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastLightningBoltTime + lightningBoltCooldown)
@@ -37,7 +37,7 @@ public class Wizzard : FighterBase
         {
             animator.SetTrigger("Ability");
         }
-        
+
         if (lightningBoltPrefab != null && firePoint != null)
         {
             GameObject lightningBolt = Instantiate(lightningBoltPrefab, firePoint.position, Quaternion.identity);
@@ -72,6 +72,7 @@ public class Wizzard : FighterBase
 
     public override void Attack(FighterBase opponent)
     {
+        Debug.Log($"{fighterName} attacks!");
         if (statusEffectManager != null && statusEffectManager.IsStunned())
         {
             Debug.Log($"{fighterName} is stunned and cannot attack!");
@@ -79,6 +80,7 @@ public class Wizzard : FighterBase
         }
 
         PlayAttackAnimation();
+        Debug.Log($"{fighterName} attacks!");
         ShootProjectile();
     }
 }

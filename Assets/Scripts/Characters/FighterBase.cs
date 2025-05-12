@@ -22,18 +22,26 @@ public abstract class FighterBase : MonoBehaviour
     public GameObject magicBoltPrefab;
     public Transform firePoint;
     public float projectileSpeed = 10f;
-    
+    public float projectileCooldown = 1f;
+    private float lastProjectileTime = -Mathf.Infinity;
+
+    [Header("Melee Attack")]
+    public float meleeRange = 1.5f;
+    public int meleeDamage = 10;
+    public LayerMask enemyLayers;
+    public Transform attackPoint;
+
     public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
     public PlayerMove PlayerMove => GetComponent<PlayerMove>();
 
     protected Animator animator;
     protected StatusEffectManager statusEffectManager;
-   
+
     private void Start()
     {
         animator = GetComponent<Animator>();
         statusEffectManager = GetComponent<StatusEffectManager>();
-        
+
         currentHealth = maxHealth;
         currentMana = maxMana;
         UpdateHpText();
@@ -52,33 +60,6 @@ public abstract class FighterBase : MonoBehaviour
         UpdateManaText();
     }
 
-    protected void ShootProjectile()
-    {
-        Debug.Log("Shoot");
-        if (magicBoltPrefab != null && firePoint != null)
-        {
-            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, firePoint.rotation);
-
-            Rigidbody2D rb = bolt.GetComponent<Rigidbody2D>();
-
-            if (rb != null)
-            {
-                float direction = 1f;
-                if (transform.localScale.x < 0)
-                {
-                    direction = -1f;
-                }
-                rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
-            }
-
-            Debug.Log($"{gameObject.name} shoots a magic bolt!");
-        }
-        else
-        {
-            Debug.LogError("Magic bolt prefab or firePoint is missing.");
-        }
-    }
-
     public virtual void TakeDamage(int amount)
     {
         PlayDamageAnimation();
@@ -94,6 +75,60 @@ public abstract class FighterBase : MonoBehaviour
     }
 
     public abstract void Attack(FighterBase opponent);
+
+    // Ranged characters default attack
+    protected virtual void ShootProjectile()
+    {
+        if (Time.time < lastProjectileTime + projectileCooldown)
+        {
+            Debug.Log("Projectile is on cooldown.");
+            return;
+        }
+
+        Debug.Log("Shoot");
+        if (magicBoltPrefab != null && firePoint != null)
+        {
+            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, firePoint.rotation);
+
+            Rigidbody2D rb = bolt.GetComponent<Rigidbody2D>();
+
+            if (rb != null)
+            {
+                float direction = 1f;
+                if (transform.localScale.x < 0)
+                {
+                    direction = -1f;
+                }
+
+                rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
+            }
+
+            Debug.Log($"{gameObject.name} shoots a magic bolt!");
+            lastProjectileTime = Time.time;
+        }
+        else
+        {
+            Debug.LogError("Magic bolt prefab or firePoint is missing.");
+        }
+    }
+
+    protected void MeleeAttack()
+    {
+        // Detect enemies within melee range
+        Collider2D[] enemiesHit = Physics2D.OverlapCircleAll(attackPoint.position, meleeRange, enemyLayers);
+
+        foreach (var enemy in enemiesHit)
+        {
+            FighterBase enemyFighter = enemy.GetComponent<FighterBase>();
+            if (enemyFighter != null)
+            {
+                Debug.Log($"{gameObject.name} hits {enemyFighter.fighterName} with melee attack!");
+                enemyFighter.TakeDamage(meleeDamage); // Apply damage to enemy
+            }
+        }
+
+        PlayAttackAnimation();
+    }
 
     protected virtual void Die()
     {
@@ -177,5 +212,13 @@ public abstract class FighterBase : MonoBehaviour
     {
         animator.SetTrigger("DeathTrigger");
         Destroy(gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.position, meleeRange);
     }
 }

@@ -14,7 +14,7 @@ public class Samurai : FighterBase
     private bool isDashing;
     private bool isPerformingAbility;
     private Vector3 dashTarget;
-    
+
     private void Update()
     {
         if (statusEffectManager.IsStunned() || isPerformingAbility) return;
@@ -49,41 +49,67 @@ public class Samurai : FighterBase
             animator.SetTrigger("Ability");
         }
 
-        float direction = 1f;
-        if (transform.localScale.x < 0)
-        {
-            direction = -1f;
-        }
+        // Determine dash direction based on the character's facing direction
+        Vector2 dashDirection = transform.localScale.x < 0 ? Vector2.left : Vector2.right;
 
-        dashTarget = transform.position + new Vector3(direction * dashDistance, 0f, 0f);
+        // Set the default dash target to be the max distance, using Vector2 for 2D space
+        dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right * direction, dashDistance);
+        // Perform a Raycast to check for obstacles and enemies
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dashDirection, dashDistance, LayerMask.GetMask("Ground", "Fighters"));
+
         if (hit.collider != null)
         {
-            FighterBase opponent = hit.collider.GetComponent<FighterBase>();
-            if (opponent != null && opponent != this)
+            // Check if we hit an enemy
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Fighters"))
             {
-                opponent.TakeDamage(dashDamage);
-
-                Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
-                if (opponentRb != null)
+                FighterBase opponent = hit.collider.GetComponent<FighterBase>();
+                if (opponent != null && opponent != this)
                 {
-                    Vector2 knockbackDirection = new Vector2(direction, 0f);
-                    opponentRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+                    // Apply damage, knockback, and stun to the opponent
+                    opponent.TakeDamage(dashDamage);
+
+                    Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
+                    if (opponentRb != null)
+                    {
+                        Vector2 knockbackDirection = new Vector2(dashDirection.x, 0f);
+                        opponentRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+                    }
+
+                    StatusEffectManager opponentStatus = opponent.GetComponent<StatusEffectManager>();
+                    if (opponentStatus != null)
+                    {
+                        opponentStatus.ApplyStun(stunDuration);
+                    }
+
+                    Debug.Log($"{fighterName} performs Dash Pierce on {opponent.fighterName} for {dashDamage} damage!");
                 }
 
-                StatusEffectManager opponentStatus = opponent.GetComponent<StatusEffectManager>();
-                if (opponentStatus != null)
+                // If there's still remaining distance after hitting the enemy, continue the dash
+                float distanceToTravelAfterEnemy = dashDistance - hit.distance;
+                if (distanceToTravelAfterEnemy > 0)
                 {
-                    opponentStatus.ApplyStun(stunDuration);
+                    dashTarget = hit.point + dashDirection * distanceToTravelAfterEnemy;
                 }
-
-                Debug.Log($"{fighterName} performs Dash Pierce on {opponent.fighterName} for {dashDamage} damage!");
+            }
+            // If we hit the ground, stop the dash at the hit point
+            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            {
+                dashTarget = hit.point;
             }
         }
+
+        // Ensure that dashTarget doesn't exceed the max dash distance
+        float remainingDistance = Vector2.Distance(transform.position, dashTarget);
+        if (remainingDistance > dashDistance)
+        {
+            dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
+        }
+
+        OnAbilityAnimationEnd();
     }
 
-    public void OnAbilityAnimationEnd()
+    private void OnAbilityAnimationEnd()
     {
         isPerformingAbility = false;
         Debug.Log("Ability animation finished.");
@@ -97,10 +123,9 @@ public class Samurai : FighterBase
             return;
         }
 
+        MeleeAttack();
         PlayAttackAnimation();
 
-        int damage = baseAttackPower + 5;
-        opponent.TakeDamage(damage);
-        Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
+        Debug.Log($"{fighterName} attacks {opponent.fighterName}");
     }
 }

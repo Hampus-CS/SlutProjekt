@@ -8,19 +8,22 @@ public class Warrior : FighterBase
     private bool isCritActive;
     private float critTimer;
     public float critDuration = 5f;
-    
+    public int critDamageMultiplier = 3;
+    private float lastCritTime = -Mathf.Infinity;
+    private float critCooldown = 5f;
+
     private void Update()
     {
-        if(statusEffectManager.IsStunned()) return;
-        
-        if(Input.GetKeyDown((KeyCode.Space)))
+        if (statusEffectManager.IsStunned()) return;
+
+        if (Input.GetKeyDown(KeyCode.Space)&& Time.time >= lastCritTime + critCooldown)
         {
             Crit();
         }
 
         if (isCritActive)
         {
-            critTimer-=Time.deltaTime;
+            critTimer -= Time.deltaTime;
             if (critTimer <= 0f)
             {
                 isCritActive = false;
@@ -28,13 +31,14 @@ public class Warrior : FighterBase
             }
         }
     }
-    
+
     private void Crit()
     {
-        isCritActive = true;   
+        isCritActive = true;
         critTimer = critDuration;
+        lastCritTime = Time.time;
     }
-    
+
     public override void Attack(FighterBase opponent)
     {
         if (statusEffectManager != null && statusEffectManager.IsStunned())
@@ -48,10 +52,11 @@ public class Warrior : FighterBase
         int damage = baseAttackPower + 5;
         if (isCritActive)
         {
-            damage *= 3;
+            damage *= critDamageMultiplier;
             isCritActive = false;
             Debug.Log($"{fighterName} lands a crit!");
         }
+
         opponent.TakeDamage(damage);
         Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
     }

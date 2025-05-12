@@ -2,29 +2,22 @@ using UnityEngine;
 
 public class MagicBolt : MonoBehaviour
 {
-    private GameObject owner;
-    
     public int damage = 10;
-    
+
     private void Start()
     {
         Destroy(gameObject, 10f);
     }
 
-    public void SetOwner(GameObject caster)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        owner = caster;
-    }
+        if (other.gameObject == this.gameObject) return;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject == owner) return;
-        
         FighterBase target = other.GetComponent<FighterBase>();
         if (target != null)
         {
             target.TakeDamage(damage);
             Destroy(gameObject);
-        }        
+        }
     }
 }
