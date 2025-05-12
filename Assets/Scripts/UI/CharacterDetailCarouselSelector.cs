@@ -6,42 +6,24 @@ using DG.Tweening;
 
 public class CharacterDetailCarouselSelector : MonoBehaviour
 {
-    [Header("UI Slots (Image, Animator, CanvasGroup on each)")]
-    [SerializeField] private Image    portraitSlotImage;
-    [SerializeField] private Animator portraitSlotAnimator;
-    [SerializeField] private Image    basicSlotImage;
-    [SerializeField] private Animator basicSlotAnimator;
-    [SerializeField] private Image    abilitySlotImage;
-    [SerializeField] private Animator abilitySlotAnimator;
+    [Header("UI Slots (Image + CanvasGroup on each)")]
+    [SerializeField] private Image portraitSlotImage;
+    [SerializeField] private Image basicSlotImage;
+    [SerializeField] private Image abilitySlotImage;
 
     [Header("Scroll Settings")]
     [Tooltip("Seconds between allowed scrolls")]
     [SerializeField] private float scrollCooldown = 0.3f;
 
-    [Header("Generic Slot Controller")]
-    [SerializeField] private RuntimeAnimatorController slotBaseController;
-    
-    private AnimationClip[] clips;
-    private Sprite[] fallbackSprites;
+    private Sprite[] slotSprites;
     private int selectedIndex;
     private bool canScroll = true;
     
-    /// <summary>
-    /// Fired whenever the center‑slot index changes (0=Portrait, 1=Basic, 2=Ability)
-    /// </summary>
     public event Action<int> OnDetailIndexChanged;
 
-    /// <summary>
-    /// Initialize with the three animator‑controllers and three fallback sprites.
-    /// Call this from CharacterDetailDisplay.SetCharacter(...).
-    /// </summary>
-    public void Initialize(
-        AnimationClip idleClip,   Sprite idleFallback,
-        AnimationClip basicClip,  Sprite basicFallback,
-        AnimationClip abilityClip,Sprite abilityFallback)
+    public void Initialize(Sprite idleSprite, Sprite basicSprite, Sprite abilitySprite)
     {
-        clips = new[] { idleClip, basicClip, abilityClip };
-        fallbackSprites = new[]  { idleFallback, basicFallback, abilityFallback };
+        slotSprites = new[] { idleSprite, basicSprite, abilitySprite };
         selectedIndex = 0;
         UpdateSlots(instant: true);
         OnDetailIndexChanged?.Invoke(0);
@@ -73,43 +55,26 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
 
     private void ChangeIndex(int delta)
     {
-        selectedIndex = (selectedIndex + delta + 3) % 3;
+        selectedIndex = (selectedIndex + delta + slotSprites.Length) % slotSprites.Length;
         UpdateSlots(instant: false);
         OnDetailIndexChanged?.Invoke(selectedIndex);
     }
 
     private void UpdateSlots(bool instant)
     {
-        int count = clips.Length;
-        int left  = (selectedIndex - 1 + count) % count;
-        int right = (selectedIndex + 1)        % count;
-        
-        ApplySlot(portraitSlotImage, portraitSlotAnimator, clips[left], fallbackSprites[left],  false, instant);
-        ApplySlot(basicSlotImage,    basicSlotAnimator,    clips[selectedIndex], fallbackSprites[selectedIndex], true,  instant);
-        ApplySlot(abilitySlotImage,  abilitySlotAnimator,  clips[right], fallbackSprites[right], false, instant);
+        ApplySlot(portraitSlotImage, slotSprites[0], selectedIndex == 0, instant);
+        ApplySlot(basicSlotImage,    slotSprites[1], selectedIndex == 1, instant);
+        ApplySlot(abilitySlotImage,  slotSprites[2], selectedIndex == 2, instant);
     }
 
-    private void ApplySlot(Image img, Animator animator, AnimationClip clip,Sprite fallback, bool isCenter, bool instant)
+    private void ApplySlot(Image img, Sprite sprite, bool isCenter, bool instant)
     {
-        // assign animation or fallback
-        if (clip != null)
-        {
-            var overrideCtrl = new AnimatorOverrideController(slotBaseController);
-            overrideCtrl["Loop"] = clip;
-            animator.runtimeAnimatorController = overrideCtrl;
-        }
-        else
-        {
-            // stop animating so the Image.sprite shows
-            animator.runtimeAnimatorController = null;
-            animator.enabled = false;
-            img.sprite = fallback;
-        }
-        // style: center vs side
-        float targetAlpha = isCenter ? 1f : 0.5f;
-        float targetScale = isCenter ? 1.2f : 0.8f; 
+        img.sprite = sprite;
 
+        float targetAlpha = isCenter ? 1f : 0.5f;
+        float targetScale = isCenter ? 1.2f : 0.8f;
         var group = img.GetComponent<CanvasGroup>();
+
         if (instant)
         {
             group.alpha = targetAlpha;
@@ -121,5 +86,4 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
             img.rectTransform.DOScale(Vector3.one * targetScale, scrollCooldown);
         }
     }
-    
 }

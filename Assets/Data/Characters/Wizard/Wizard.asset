@@ -15,12 +15,9 @@ MonoBehaviour:
   id: 3
   displayName: Raizel, The Storm Sage
   title: 
-  uiIdleClip: {fileID: 7400000, guid: ee6a432dfd411944483a2b555eac5da2, type: 2}
-  uiBasicAttackClip: {fileID: 7400000, guid: feb60c614957cdf41b416bd0b8caa19b, type: 2}
-  uiAbilityClip: {fileID: 7400000, guid: cb7b24edeeb62ff4283c446f4ea3b55a, type: 2}
-  fallbackIdleSprite: {fileID: 4723107735738678597, guid: 0aecbd3fe0ad14542990cdebcc57f2cf, type: 3}
-  fallbackBasicAttackSprite: {fileID: 4976274401295337057, guid: 51799efde9d71e94cb32828d8af1f844, type: 3}
-  fallbackAbilitySprite: {fileID: 9220252021294270350, guid: bb788b95a0b598843a413173b20a30ba, type: 3}
+  idleSprite: {fileID: 4723107735738678597, guid: 0aecbd3fe0ad14542990cdebcc57f2cf, type: 3}
+  basicAttackSprite: {fileID: 6934013284892070054, guid: 62244c0f0e3ed4f4696cc63b1ede0915, type: 3}
+  abilitySprite: {fileID: 1817195990524489003, guid: bb788b95a0b598843a413173b20a30ba, type: 3}
   lore: Raizel, once a respected scholar within the mystical citadel of Arkalis,
     spent decades studying the chaotic power of storms. After a disastrous experiment
     to harness lightning itself resulted in the destruction of his beloved academy,
@@ -29,6 +26,6 @@ MonoBehaviour:
     a feared combatant in underground street battles, Raizel channels his rage into
     electrifying orbs, striking opponents with searing precision and earning the
     title "Storm Sage."
-  abilityDescription: Ability Description Placeholder
   basicAttackDescription: Basic Attack Description Placeholder
+  abilityDescription: Ability Description Placeholder
   fighterPrefab: {fileID: 5251138399461381211, guid: 55797f11487b8a849816cafa58f3cc84, type: 3}

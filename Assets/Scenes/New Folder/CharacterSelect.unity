@@ -538,17 +538,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0797a0752fb812647a64b07216721fc0, type: 2}
   - {fileID: 11400000, guid: f39c7fec0d994a54699c83eaf926c851, type: 2}
   slotLeftImage: {fileID: 505855962}
-  slotLeftAnimator: {fileID: 505855965}
   slotCenterImage: {fileID: 1238963136}
-  slotCenterAnimator: {fileID: 1238963139}
   slotRightImage: {fileID: 718510130}
-  slotRightAnimator: {fileID: 718510133}
   scrollCooldown: 0.3
   sideAlpha: 0.5
   sideScale: 0.8
   centerAlpha: 1
   centerScale: 1.2
-  slotBaseController: {fileID: 9100000, guid: 8de899a117d976e488c76526677549f6, type: 2}
   selectedIndex: 0
 --- !u!1 &298830444
 GameObject:
@@ -812,7 +808,7 @@ Animator:
   m_GameObject: {fileID: 505855959}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8de899a117d976e488c76526677549f6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1066,7 +1062,7 @@ Animator:
   m_GameObject: {fileID: 718510127}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8de899a117d976e488c76526677549f6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2292,6 +2288,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7621311a0179da4488637060f80fa2b4, type: 2}
   - {fileID: 11400000, guid: 0797a0752fb812647a64b07216721fc0, type: 2}
   - {fileID: 11400000, guid: f39c7fec0d994a54699c83eaf926c851, type: 2}
+  - {fileID: 11400000, guid: 899f001422915784faca19443c3d2dcd, type: 2}
   carouselPanelRoot: {fileID: 61590275}
   detailPanelRoot: {fileID: 1635357344}
   carouselSelector: {fileID: 61590278}
@@ -2411,7 +2408,7 @@ Animator:
   m_GameObject: {fileID: 1238963133}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8de899a117d976e488c76526677549f6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2867,13 +2864,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   portraitSlotImage: {fileID: 1215318147}
-  portraitSlotAnimator: {fileID: 1215318149}
   basicSlotImage: {fileID: 571925771}
-  basicSlotAnimator: {fileID: 571925773}
   abilitySlotImage: {fileID: 995835261}
-  abilitySlotAnimator: {fileID: 995835263}
   scrollCooldown: 0.3
-  slotBaseController: {fileID: 9100000, guid: 8de899a117d976e488c76526677549f6, type: 2}
 --- !u!1 &2038999318
 GameObject:
   m_ObjectHideFlags: 0

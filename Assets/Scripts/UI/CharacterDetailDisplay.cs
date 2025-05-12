@@ -16,27 +16,21 @@ public class CharacterDetailDisplay : MonoBehaviour
     private CharacterData currentData;
     private int currentAspectIndex = 0;
     
-    // Event fired by this display when user wants to go back
-    public event Action OnBack;
-    // Event fired when user confirms; passes chosen aspect index (0=Idle,1=Basic,2=Ability)
-    public event Action<int> OnConfirm;
-    
-    /// <summary>
-    /// Called by the manager when entering the detail panel.
-    /// </summary>
     public void SetCharacter(CharacterData data)
     {
         currentData = data;
+
         //nameText.text  = data.displayName;
         //titleText.text = data.title;
 
-        // Initialize the carousel with animations & fallbacks
-        detailCarousel.Initialize(data.uiIdleClip, data.fallbackIdleSprite, data.uiBasicAttackClip, data.fallbackBasicAttackSprite, data.uiAbilityClip, data.fallbackAbilitySprite);
+        detailCarousel.Initialize(
+            data.idleSprite,
+            data.basicAttackSprite,
+            data.abilitySprite
+        );
 
-        // Subscribe to index changes
         detailCarousel.OnDetailIndexChanged += OnAspectChanged;
 
-        // Wire buttons
         backButton.onClick.RemoveAllListeners();
         backButton.onClick.AddListener(() => OnBack?.Invoke());
 
@@ -46,15 +40,15 @@ public class CharacterDetailDisplay : MonoBehaviour
 
     void OnDisable()
     {
-        // Unsubscribe when panel is hidden to avoid leaks
         detailCarousel.OnDetailIndexChanged -= OnAspectChanged;
     }
     
+    public event Action OnBack;
+    public event Action<int> OnConfirm;
+
     private void OnAspectChanged(int idx)
     {
         currentAspectIndex = idx;
-
-        // Update the description text based on aspect
         switch (idx)
         {
             case 0:

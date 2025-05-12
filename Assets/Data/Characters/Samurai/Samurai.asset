@@ -15,13 +15,10 @@ MonoBehaviour:
   id: 4
   displayName: 
   title: 
-  uiIdleAnimator: {fileID: 0}
-  uiBasicAttackAnimator: {fileID: 0}
-  uiAbilityAnimator: {fileID: 0}
-  fallbackIdleSprite: {fileID: 0}
-  fallbackBasicAttackSprite: {fileID: 0}
-  fallbackAbilitySprite: {fileID: 0}
+  idleSprite: {fileID: -7385789195546760866, guid: e3b495d9523faf74e9b4b67d89b1b856, type: 3}
+  basicAttackSprite: {fileID: 6934013284892070054, guid: d1371787a9c428e48b88c515374713fc, type: 3}
+  abilitySprite: {fileID: 8288915215451595207, guid: 09ff3ceacca261a4db91c06c3a7a9826, type: 3}
   lore: 
-  abilityDescription: Ability Description Placeholder
   basicAttackDescription: Basic Attack Description Placeholder
+  abilityDescription: Ability Description Placeholder
   fighterPrefab: {fileID: 0}

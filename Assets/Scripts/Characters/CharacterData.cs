@@ -10,25 +10,20 @@ public class CharacterData : ScriptableObject
     public string displayName;
     public string title;
     
-    [Header("UI Animation Clips")]
-    public AnimationClip uiIdleClip;
-    public AnimationClip uiBasicAttackClip;
-    public AnimationClip uiAbilityClip;
-    
-    [Header("UI Sprites (fallback)")]
-    [Tooltip("Static sprite used only if no idle animation is assigned")]
-    public Sprite fallbackIdleSprite;
-    [Tooltip("Static sprite used only if no basic‑attack animation is assigned")]
-    public Sprite fallbackBasicAttackSprite;
-    [Tooltip("Static sprite used only if no ability animation is assigned")]
-    public Sprite fallbackAbilitySprite;
+    [Header("UI Sprites")]
+    [Tooltip("Static sprite for the idle pose in the carousel slots")]
+    public Sprite idleSprite;
+    [Tooltip("Static sprite for the basic-attack preview in detail panel")]
+    public Sprite basicAttackSprite;
+    [Tooltip("Static sprite for the special-ability preview in detail panel")]
+    public Sprite abilitySprite;
 
     [Header("Descriptions")]
     [TextArea] public string lore;
-    [TextArea] public string abilityDescription;
     [TextArea] public string basicAttackDescription;
+    [TextArea] public string abilityDescription;
     
-    [Header("In‑Game Prefab")]
+    [Header("In-Game Prefab")]
     [Tooltip("The prefab instantiated when the match starts")]
     public GameObject fighterPrefab;
 }

@@ -15,12 +15,9 @@ MonoBehaviour:
   id: 0
   displayName: Garok, The Iron Guardian
   title: 
-  uiIdleClip: {fileID: 7400000, guid: c8454973fc2f20c40a2e1e97bd5b86dd, type: 2}
-  uiBasicAttackClip: {fileID: 7400000, guid: 077e64208ecbe594a8c9197966117b4b, type: 2}
-  uiAbilityClip: {fileID: 7400000, guid: 077e64208ecbe594a8c9197966117b4b, type: 2}
-  fallbackIdleSprite: {fileID: -7385789195546760866, guid: 132f4daf730951446901a088507d394b, type: 3}
-  fallbackBasicAttackSprite: {fileID: 6934013284892070054, guid: 03f4052699156eb429aaa65d26a1f15e, type: 3}
-  fallbackAbilitySprite: {fileID: 7441861488978599509, guid: 2489416ea4859aa4c94631e69f00da0f, type: 3}
+  idleSprite: {fileID: 4723107735738678597, guid: 132f4daf730951446901a088507d394b, type: 3}
+  basicAttackSprite: {fileID: 6934013284892070054, guid: 03f4052699156eb429aaa65d26a1f15e, type: 3}
+  abilitySprite: {fileID: 7441861488978599509, guid: 2489416ea4859aa4c94631e69f00da0f, type: 3}
   lore: Garok hails from the rugged highlands, where conflict was life and survival
     meant mastering combat. His unmatched strength and valor made him a legend among
     warriors, but betrayal by his clan forced him into exile. Arriving in urban battlegrounds
@@ -28,6 +25,6 @@ MonoBehaviour:
     sheer resilience and masterful weaponry. Known as "The Iron Guardian," his brute
     strength and relentless style have carved a legend into the stone-cobbled streets,
     inspiring awe and dread in every fight he enters.
-  abilityDescription: Ability Description Placeholder
   basicAttackDescription: Basic Attack Description Placeholder
+  abilityDescription: Ability Description Placeholder
   fighterPrefab: {fileID: 5251138399461381211, guid: ebf9e54ac9d512e4399b1af2080fe7ef, type: 3}
