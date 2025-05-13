@@ -234,7 +234,7 @@ MonoBehaviour:
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
+  AutoSetKinematicOnDespawn: 0
 --- !u!114 &4224143124111838119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,6 +332,13 @@ MonoBehaviour:
   magicBoltPrefab: {fileID: 5506060198856121997, guid: 88aad58662d65c84aad66114abf8ba7b, type: 3}
   firePoint: {fileID: 6779143843145325377}
   projectileSpeed: 10
+  projectileCooldown: 1
+  meleeRange: 1.5
+  meleeDamage: 10
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  attackPoint: {fileID: 0}
   fireballPrefab: {fileID: 6444269908575786961, guid: 4c8991ae418bf6244a35a018e0bc0122, type: 3}
   fireballSpeed: 10
   fireballCooldown: 5

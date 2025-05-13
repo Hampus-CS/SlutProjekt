@@ -196,8 +196,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
+  AutoUpdateKinematicState: 0
+  AutoSetKinematicOnDespawn: 0
 --- !u!70 &8655087283997866265
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -332,6 +332,13 @@ MonoBehaviour:
   magicBoltPrefab: {fileID: 0}
   firePoint: {fileID: 0}
   projectileSpeed: 10
+  projectileCooldown: 1
+  meleeRange: 1.5
+  meleeDamage: 10
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  attackPoint: {fileID: 0}
   lightningBoltPrefab: {fileID: 0}
   lightningBoltSpeed: 15
   lightningBoltCooldown: 3

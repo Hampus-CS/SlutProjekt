@@ -232,8 +232,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
+  AutoUpdateKinematicState: 0
+  AutoSetKinematicOnDespawn: 0
 --- !u!114 &2896229071126493811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,7 +331,15 @@ MonoBehaviour:
   magicBoltPrefab: {fileID: 0}
   firePoint: {fileID: 0}
   projectileSpeed: 10
+  projectileCooldown: 1
+  meleeRange: 1.5
+  meleeDamage: 10
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  attackPoint: {fileID: 0}
   critDuration: 5
+  critDamageMultiplier: 3
 --- !u!114 &-5563717477408993157
 MonoBehaviour:
   m_ObjectHideFlags: 0

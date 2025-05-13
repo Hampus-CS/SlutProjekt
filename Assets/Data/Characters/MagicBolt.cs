@@ -6,7 +6,7 @@ public class MagicBolt : MonoBehaviour
 
     private void Start()
     {
-        Destroy(gameObject, 10f);
+        Destroy(gameObject, 2.5f);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -17,7 +17,9 @@ public class MagicBolt : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(damage);
-            Destroy(gameObject);
         }
+        
+        Destroy(gameObject);
+        
     }
 }

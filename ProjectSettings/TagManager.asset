@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Ground
   - Fighters
-  - 
+  - Projectile
   - 
   - 
   - 
@@ -40,6 +40,18 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BackGrounds
+    uniqueID: 2575584011
+    locked: 0
+  - name: Players
+    uniqueID: 786919711
+    locked: 0
+  - name: ForeGrounds
+    uniqueID: 2118205253
+    locked: 0
+  - name: UI
+    uniqueID: 2070946931
     locked: 0
   m_RenderingLayers:
   - Default

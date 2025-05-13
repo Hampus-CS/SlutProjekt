@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 
 public abstract class FighterBase : MonoBehaviour
 {
@@ -10,9 +10,9 @@ public abstract class FighterBase : MonoBehaviour
     public int maxHealth = 100;
 
     [Header("UI Elements")]
-    public TextMeshProUGUI hpText;
-    public TextMeshProUGUI manaText;
-
+    public Slider healthSlider;
+    public Slider manaSlider;
+    
     [Header("Mana System")]
     public float maxMana = 100f;
     public float currentMana = 100f;
@@ -44,8 +44,21 @@ public abstract class FighterBase : MonoBehaviour
 
         currentHealth = maxHealth;
         currentMana = maxMana;
-        UpdateHpText();
-        UpdateManaText();
+        
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
+        }
+
+        if (manaSlider != null)
+        {
+            manaSlider.maxValue = maxMana;
+            manaSlider.value = currentMana;
+        }
+        
+        UpdateHealthSlider();
+        UpdateManaSlider();
 
         if (statusEffectManager == null)
         {
@@ -56,14 +69,14 @@ public abstract class FighterBase : MonoBehaviour
     private void FixedUpdate()
     {
         RegenerateMana();
-        UpdateHpText();
-        UpdateManaText();
+        UpdateManaSlider();
     }
 
     public virtual void TakeDamage(int amount)
     {
         PlayDamageAnimation();
         currentHealth -= amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         if (currentHealth <= 0)
         {
@@ -71,7 +84,7 @@ public abstract class FighterBase : MonoBehaviour
             Die();
         }
 
-        UpdateHpText();
+        UpdateHealthSlider();
     }
 
     public abstract void Attack(FighterBase opponent);
@@ -143,23 +156,29 @@ public abstract class FighterBase : MonoBehaviour
         }
     }
 
-    private void UpdateHpText()
+    private void UpdateHealthSlider()
     {
-        if (hpText != null)
+        if (healthSlider != null)
         {
-            hpText.text = "HP: " + currentHealth;
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
         }
         else
         {
-            Debug.LogWarning("hpText is not assigned on " + gameObject.name);
+            Debug.LogWarning("hpSlider is not assigned on " + gameObject.name);
         }
     }
 
-    private void UpdateManaText()
+    private void UpdateManaSlider()
     {
-        if (manaText != null)
+        if (manaSlider != null)
         {
-            manaText.text = "Mana: " + Mathf.FloorToInt(currentMana).ToString();
+            manaSlider.maxValue = maxMana;
+            manaSlider.value = currentMana;
+        }
+        else
+        {
+            Debug.LogWarning("manaSlider is not assigned on " + gameObject.name);
         }
     }
 
@@ -180,6 +199,7 @@ public abstract class FighterBase : MonoBehaviour
     protected void SpendMana(int amount)
     {
         currentMana -= amount;
+        currentMana = Mathf.Clamp(currentMana, 0, maxMana);
 
         if (currentMana < 0)
         {
