@@ -1,5 +1,9 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
 public class CharacterSelectionManager : MonoBehaviour
 {
@@ -16,7 +20,30 @@ public class CharacterSelectionManager : MonoBehaviour
 
     private CharacterData selectedCharacter;
     private int selectedAspectIndex;
-    
+    private PlayerSelectData localPlayerSelectData;
+
+    private void Awake()
+    {
+        /* Require an active NGO session */
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogError("[CharacterSelectionManager] No NetworkManager – start Host/Client before loading CharacterSelect.");
+            enabled = false;
+            return;
+        }
+
+        if (NetworkManager.Singleton.LocalClient == null ||
+            NetworkManager.Singleton.LocalClient.PlayerObject == null)
+        {
+            Debug.LogError("[CharacterSelectionManager] Local PlayerObject not spawned yet.");
+            enabled = false;
+            return;
+        }
+
+        localPlayerSelectData = NetworkManager.Singleton.LocalClient.PlayerObject
+            .GetComponent<PlayerSelectData>();          // :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+    }
+
     void Start()
     {
         // 1) Initialize the fighter carousel
@@ -54,19 +81,29 @@ public class CharacterSelectionManager : MonoBehaviour
     private void OnDetailConfirmed(int aspectIdx)
     {
         selectedAspectIndex = aspectIdx;
-        LaunchFight();
+        
+        /* Tell the server what we picked */
+        localPlayerSelectData.SelectCharacter(selectedCharacter.id);
+        localPlayerSelectData.SetReady();
+
+        /* Host: check if everyone is Ready */
+        if (NetworkManager.Singleton.IsHost)
+            TryStartMatchIfEveryoneReady();
+        
     }
 
     /// <summary>
-    /// Load the arena scene and spawn the fighter prefab.
+    /// Host‑only: verify readiness across all clients and load the fight scene.
     /// </summary>
-    private void LaunchFight()
+    private void TryStartMatchIfEveryoneReady()
     {
-        Debug.Log($"Launching fight as {selectedCharacter.displayName}, aspect {selectedAspectIndex}");
-        
-        // ex:
-        // SceneManager.LoadScene("FightScene");
-        // Then in that scene, you could instantiate:
-        // Instantiate(selectedCharacter.fighterPrefab, spawnPoint, Quaternion.identity);
+        bool allReady = NetworkManager.Singleton.ConnectedClientsList
+            .All(c => c.PlayerObject.GetComponent<PlayerSelectData>().IsReady.Value);
+
+        if (allReady)
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene(
+                "FightScene", LoadSceneMode.Single);
+        }
     }
 }

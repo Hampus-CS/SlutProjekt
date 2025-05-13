@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Spawns the correct selected character prefab for each player.
@@ -8,17 +9,14 @@ using System.Collections.Generic;
 public class FightSpawner : MonoBehaviour
 {
     [Header("Character Prefabs")]
-    [SerializeField] private List<GameObject> characterPrefabs; // List ordered by ID
-
+    [SerializeField] private List<CharacterData> allCharacters;
     [Header("Spawn Settings")]
     [SerializeField] private Transform[] spawnPoints; // Points where players spawn
 
     private void Start()
     {
         if (NetworkManager.Singleton.IsServer)
-        {
             SpawnPlayers();
-        }
     }
 
     private void SpawnPlayers()
@@ -27,31 +25,22 @@ public class FightSpawner : MonoBehaviour
 
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            var playerObject = client.PlayerObject;
-            if (playerObject == null)
-                continue;
+            var playerSelectData = client.PlayerObject.GetComponent<PlayerSelectData>();
+            int id    = playerSelectData.SelectedCharacterId.Value;
+            var data  = allCharacters.FirstOrDefault(c => c.id == id);
 
-            var playerData = playerObject.GetComponent<PlayerSelectData>();
-            if (playerData == null)
-                continue;
-
-            int selectedCharacterId = playerData.SelectedCharacterId.Value;
-
-            if (selectedCharacterId >= 0 && selectedCharacterId < characterPrefabs.Count)
+            if (data == null)
             {
-                GameObject prefab = characterPrefabs[selectedCharacterId];
-                Vector3 spawnPosition = spawnPoints[Mathf.Min(spawnIndex, spawnPoints.Length - 1)].position;
-                Quaternion spawnRotation = Quaternion.identity;
-
-                GameObject playerInstance = Instantiate(prefab, spawnPosition, spawnRotation);
-                playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(client.ClientId);
-
-                Debug.Log($"[FightSpawner] Spawned player {client.ClientId} with character ID {selectedCharacterId} at {spawnPosition}");
+                Debug.LogWarning($"Unknown character id {id}");
+                continue;
             }
-            else
-            {
-                Debug.LogWarning($"[FightSpawner] Invalid character ID for player {client.ClientId}");
-            }
+
+            var go = Instantiate(data.fighterPrefab,
+                spawnPoints[spawnIndex].position,
+                Quaternion.identity);
+
+            go.GetComponent<NetworkObject>()
+                .SpawnAsPlayerObject(client.ClientId);
 
             spawnIndex++;
         }
