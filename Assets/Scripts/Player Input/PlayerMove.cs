@@ -43,7 +43,7 @@ public class PlayerMove : NetworkBehaviour
 
     private void Update()
     {
-        // if (!IsOwner) return; // Prevent non-owners from moving
+        if (!IsOwner) return; // Prevent non-owners from moving
         if (isDashing) return;
         if (isMovementBlocked) return;
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public abstract class FighterBase : MonoBehaviour
 {
@@ -43,6 +44,15 @@ public abstract class FighterBase : MonoBehaviour
 
     private void Start()
     {
+        // 1) Find your singleton HUD sliders and bind them if this is the local player's object
+        var netObj = GetComponent<NetworkObject>();
+        if (netObj != null && netObj.IsOwner)
+        {
+            healthSlider = HUDManager.Instance.HealthSlider;
+            manaSlider   = HUDManager.Instance.ManaSlider;
+        }
+        
+        // 2) (Optional) If you're using that Sliders helper, keep it—otherwise you can remove it
         sliderUI = FindFirstObjectByType<Sliders>();
         animator = GetComponent<Animator>();
         statusEffectManager = GetComponent<StatusEffectManager>();
@@ -50,6 +60,7 @@ public abstract class FighterBase : MonoBehaviour
         currentHealth = maxHealth;
         currentMana = maxMana;
         
+        // 3) Now initialize the sliders on the canvas via your fields
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;

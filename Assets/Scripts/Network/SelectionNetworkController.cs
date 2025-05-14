@@ -6,6 +6,8 @@ public class SelectionNetworkController : NetworkBehaviour
 {
     public static SelectionNetworkController Instance { get; private set; }
 
+    private Dictionary<ulong, int> selectionMap = new Dictionary<ulong,int>();
+    
     // server‐side record
     private HashSet<ulong> readyClients = new HashSet<ulong>();
 
@@ -16,6 +18,12 @@ public class SelectionNetworkController : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public bool TryGetSelection(ulong clientId, out int characterId)
+    {
+        return selectionMap.TryGetValue(clientId, out characterId);
+    }
+
+    
     /// <summary>
     /// Called by any client when they confirm their selection.
     /// </summary>
@@ -25,9 +33,10 @@ public class SelectionNetworkController : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SubmitSelectionServerRpc(
-        ulong clientId, int characterId, int aspectIdx)
+    private void SubmitSelectionServerRpc(ulong clientId, int characterId, int aspectIdx)
     {
+        selectionMap[clientId] = characterId;
+        
         readyClients.Add(clientId);
         Debug.Log($"[Server] Client {clientId} ready (char {characterId}, asp {aspectIdx})");
 

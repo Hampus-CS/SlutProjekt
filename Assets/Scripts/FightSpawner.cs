@@ -5,6 +5,7 @@ using System.Linq;
 
 /// <summary>
 /// Spawns the correct selected character prefab for each player.
+/// reading their choice from the SelectionNetworkController’s server‐side map.
 /// </summary>
 public class FightSpawner : MonoBehaviour
 {
@@ -21,28 +22,49 @@ public class FightSpawner : MonoBehaviour
 
     private void SpawnPlayers()
     {
+        var controller = SelectionNetworkController.Instance;
+        if (controller == null)
+        {
+            Debug.LogError("[FightSpawner] No SelectionNetworkController found!");
+            return;
+        }
+        
         int spawnIndex = 0;
 
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            var playerSelectData = client.PlayerObject.GetComponent<PlayerSelectData>();
-            int id    = playerSelectData.SelectedCharacterId.Value;
-            var data  = allCharacters.FirstOrDefault(c => c.id == id);
-
-            if (data == null)
+            // Ask the controller for this client’s chosen character ID
+            if (!controller.TryGetSelection(client.ClientId, out int charId))
             {
-                Debug.LogWarning($"Unknown character id {id}");
+                Debug.LogWarning($"[FightSpawner] No selection recorded for client {client.ClientId}");
                 continue;
             }
 
-            var go = Instantiate(data.fighterPrefab,
+            // Find the CharacterData for that ID
+            var data = allCharacters.FirstOrDefault(c => c.id == charId);
+            if (data == null)
+            {
+                Debug.LogWarning($"[FightSpawner] Unknown character id {charId} for client {client.ClientId}");
+                continue;
+            }
+
+            // Instantiate and spawn the prefab
+            var go = Instantiate(
+                data.fighterPrefab,
                 spawnPoints[spawnIndex].position,
-                Quaternion.identity);
+                Quaternion.identity
+            );
+            var netObj = go.GetComponent<NetworkObject>();
+            if (netObj == null)
+            {
+                Debug.LogError("[FightSpawner] Prefab missing NetworkObject component!");
+                Destroy(go);
+                continue;
+            }
 
-            go.GetComponent<NetworkObject>()
-                .SpawnAsPlayerObject(client.ClientId);
-
+            netObj.SpawnWithOwnership(client.ClientId);
             spawnIndex++;
+            
         }
     }
 }

@@ -21,4 +21,4 @@ MonoBehaviour:
   lore: 
   basicAttackDescription: Basic Attack Description Placeholder
   abilityDescription: Ability Description Placeholder
-  fighterPrefab: {fileID: 0}
+  fighterPrefab: {fileID: 5251138399461381211, guid: fb3d899ebc49a46498be752d97690501, type: 3}
