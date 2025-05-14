@@ -18,32 +18,12 @@ public class CharacterSelectionManager : MonoBehaviour
     public CharacterCarouselSelector carouselSelector;
     public CharacterDetailDisplay    detailDisplay;
 
+    // server‐side record of which clients have confirmed
+    private HashSet<ulong> readyClients = new HashSet<ulong>();
+    
     private CharacterData selectedCharacter;
     private int selectedAspectIndex;
-    private PlayerSelectData localPlayerSelectData;
-
-    private void Awake()
-    {
-        /* Require an active NGO session */
-        if (NetworkManager.Singleton == null)
-        {
-            Debug.LogError("[CharacterSelectionManager] No NetworkManager – start Host/Client before loading CharacterSelect.");
-            enabled = false;
-            return;
-        }
-
-        if (NetworkManager.Singleton.LocalClient == null ||
-            NetworkManager.Singleton.LocalClient.PlayerObject == null)
-        {
-            Debug.LogError("[CharacterSelectionManager] Local PlayerObject not spawned yet.");
-            enabled = false;
-            return;
-        }
-
-        localPlayerSelectData = NetworkManager.Singleton.LocalClient.PlayerObject
-            .GetComponent<PlayerSelectData>();          // :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
-    }
-
+    
     void Start()
     {
         // 1) Initialize the fighter carousel
@@ -74,36 +54,15 @@ public class CharacterSelectionManager : MonoBehaviour
 
         PanelTransition.SwapPanels(detailPanelRoot, carouselPanelRoot, 0.4f);
     }
-
-    /// <summary>
-    /// Called when “Confirm” is pressed in detail. Starts the fight.
-    /// </summary>
+    
     private void OnDetailConfirmed(int aspectIdx)
     {
         selectedAspectIndex = aspectIdx;
         
-        /* Tell the server what we picked */
-        localPlayerSelectData.SelectCharacter(selectedCharacter.id);
-        localPlayerSelectData.SetReady();
+        Debug.Log($"Chosen: {selectedCharacter.displayName} Aspect {aspectIdx}");
 
-        /* Host: check if everyone is Ready */
-        if (NetworkManager.Singleton.IsHost)
-            TryStartMatchIfEveryoneReady();
+        // hand off to the network controller
+        SelectionNetworkController.Instance.SubmitSelection(selectedCharacter.id, aspectIdx);
         
-    }
-
-    /// <summary>
-    /// Host‑only: verify readiness across all clients and load the fight scene.
-    /// </summary>
-    private void TryStartMatchIfEveryoneReady()
-    {
-        bool allReady = NetworkManager.Singleton.ConnectedClientsList
-            .All(c => c.PlayerObject.GetComponent<PlayerSelectData>().IsReady.Value);
-
-        if (allReady)
-        {
-            NetworkManager.Singleton.SceneManager.LoadScene(
-                "FightScene", LoadSceneMode.Single);
-        }
     }
 }

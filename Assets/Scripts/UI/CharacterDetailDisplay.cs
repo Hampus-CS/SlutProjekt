@@ -16,6 +16,9 @@ public class CharacterDetailDisplay : MonoBehaviour
     private CharacterData currentData;
     private int currentAspectIndex = 0;
     
+    public event Action OnBack;
+    public event Action<int> OnConfirm;
+    
     public void SetCharacter(CharacterData data)
     {
         currentData = data;
@@ -42,9 +45,6 @@ public class CharacterDetailDisplay : MonoBehaviour
     {
         detailCarousel.OnDetailIndexChanged -= OnAspectChanged;
     }
-    
-    public event Action OnBack;
-    public event Action<int> OnConfirm;
 
     private void OnAspectChanged(int idx)
     {

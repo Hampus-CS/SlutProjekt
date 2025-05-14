@@ -15,7 +15,7 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
     [Tooltip("Seconds between allowed scrolls")]
     [SerializeField] private float scrollCooldown = 0.3f;
 
-    private Sprite[] slotSprites;
+    private Sprite[] sprites;
     private int selectedIndex;
     private bool canScroll = true;
     
@@ -23,7 +23,7 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
 
     public void Initialize(Sprite idleSprite, Sprite basicSprite, Sprite abilitySprite)
     {
-        slotSprites = new[] { idleSprite, basicSprite, abilitySprite };
+        sprites = new[] { idleSprite, basicSprite, abilitySprite };
         selectedIndex = 0;
         UpdateSlots(instant: true);
         OnDetailIndexChanged?.Invoke(0);
@@ -43,7 +43,7 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
     
     public void MoveLeft()  => StartCoroutine(ScrollCooldown(() => ChangeIndex(+1)));
     public void MoveRight() => StartCoroutine(ScrollCooldown(() => ChangeIndex(-1)));
-    public void Confirm()   => OnDetailIndexChanged?.Invoke(selectedIndex);
+    public void Confirm() => OnDetailIndexChanged?.Invoke(selectedIndex);
 
     private IEnumerator ScrollCooldown(Action act)
     {
@@ -55,16 +55,21 @@ public class CharacterDetailCarouselSelector : MonoBehaviour
 
     private void ChangeIndex(int delta)
     {
-        selectedIndex = (selectedIndex + delta + slotSprites.Length) % slotSprites.Length;
+        selectedIndex = (selectedIndex + delta + sprites.Length) % sprites.Length;
         UpdateSlots(instant: false);
         OnDetailIndexChanged?.Invoke(selectedIndex);
     }
 
     private void UpdateSlots(bool instant)
     {
-        ApplySlot(portraitSlotImage, slotSprites[0], selectedIndex == 0, instant);
-        ApplySlot(basicSlotImage,    slotSprites[1], selectedIndex == 1, instant);
-        ApplySlot(abilitySlotImage,  slotSprites[2], selectedIndex == 2, instant);
+        
+        int count = sprites.Length;                 
+        int left  = (selectedIndex - 1 + count) % count;
+        int right = (selectedIndex + 1) % count;
+        
+        ApplySlot(portraitSlotImage, sprites[left],   false, instant);
+        ApplySlot(basicSlotImage,    sprites[selectedIndex], true, instant);
+        ApplySlot(abilitySlotImage,  sprites[right],  false, instant);
     }
 
     private void ApplySlot(Image img, Sprite sprite, bool isCenter, bool instant)
