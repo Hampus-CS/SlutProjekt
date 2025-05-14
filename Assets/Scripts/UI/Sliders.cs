@@ -14,6 +14,7 @@ public class Sliders : MonoBehaviour
     private bool flashHealthOnDamage = false;
 
     private float flashSpeed = 4f;
+    public float flashPrecent = 0.3f;
 
     void Start()
     {
@@ -28,7 +29,7 @@ public class Sliders : MonoBehaviour
         {
             UpdateSliderVisual(healthSlider, healthFillImage, Color.red, Color.green);
         }
-        UpdateSliderVisual(manaSlider, manaFillImage, Color.red, Color.blue);
+        UpdateSliderVisual(manaSlider, manaFillImage, Color.red,new Color(0.529f, 0.808f, 0.980f));
     }
 
     void UpdateSliderVisual(Slider slider, Image fillImage, Color lowColor, Color fullColor)
@@ -36,11 +37,12 @@ public class Sliders : MonoBehaviour
         if (slider == null || fillImage == null) return;
 
         float fillPercent = slider.value / slider.maxValue;
-        Color baseColor = Color.Lerp(lowColor, fullColor, fillPercent);
 
-        if (fillPercent <= 0.2f)
+        Color baseColor = fillPercent <= flashPrecent ? lowColor : fullColor;
+
+        if (fillPercent <= flashPrecent)
         {
-            // Flash
+            // Flash when under flashPrecent (30%)
             float alpha = Mathf.Lerp(0.25f, 1f, Mathf.Abs(Mathf.Sin(Time.time * flashSpeed)));
             baseColor.a = alpha;
         }
@@ -51,6 +53,7 @@ public class Sliders : MonoBehaviour
 
         fillImage.color = baseColor;
     }
+
 
     Image CustomizeSlider(Slider slider)
     {

@@ -75,6 +75,6 @@ public class Mage : FighterBase
         
         PlayAttackAnimation();
         Debug.Log($"{fighterName} attacks!");
-        ShootProjectile();
+        ProjectileAttack();
     }
 }

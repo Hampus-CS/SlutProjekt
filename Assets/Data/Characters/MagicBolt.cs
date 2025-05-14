@@ -11,8 +11,6 @@ public class MagicBolt : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject == this.gameObject) return;
-
         FighterBase target = other.GetComponent<FighterBase>();
         if (target != null)
         {
@@ -20,6 +18,5 @@ public class MagicBolt : MonoBehaviour
         }
         
         Destroy(gameObject);
-        
     }
 }

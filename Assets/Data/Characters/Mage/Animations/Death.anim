@@ -84,11 +84,4 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events:
-  - time: 0.41666666
-    functionName: PlayDeathAnimation
-    data: 
-    objectReferenceParameter: {fileID: 5251138399461381211, guid: 897db42b462e1304ba1b7313c7216ece, type: 3}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
+  m_Events: []

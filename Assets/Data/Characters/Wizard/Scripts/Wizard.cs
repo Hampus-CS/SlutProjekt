@@ -81,6 +81,6 @@ public class Wizard : FighterBase
 
         PlayAttackAnimation();
         Debug.Log($"{fighterName} attacks!");
-        ShootProjectile();
+        ProjectileAttack();
     }
 }

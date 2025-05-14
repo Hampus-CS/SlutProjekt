@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public abstract class FighterBase : MonoBehaviour
@@ -31,6 +32,8 @@ public abstract class FighterBase : MonoBehaviour
     public int meleeDamage = 10;
     public LayerMask enemyLayers;
     public Transform attackPoint;
+    private float meleeAttackCooldown = 1f;
+    private float lastMeleeTime = -Mathf.Infinity;
 
     public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
     public PlayerMove PlayerMove => GetComponent<PlayerMove>();
@@ -96,7 +99,7 @@ public abstract class FighterBase : MonoBehaviour
     public abstract void Attack(FighterBase opponent);
 
     // Ranged characters default attack
-    protected virtual void ShootProjectile()
+    protected virtual void ProjectileAttack()
     {
         if (Time.time < lastProjectileTime + projectileCooldown)
         {
@@ -113,12 +116,7 @@ public abstract class FighterBase : MonoBehaviour
 
             if (rb != null)
             {
-                float direction = 1f;
-                if (transform.localScale.x < 0)
-                {
-                    direction = -1f;
-                }
-
+                float direction = transform.localScale.x < 0 ? 1f : -1f;
                 rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
             }
 
@@ -133,6 +131,12 @@ public abstract class FighterBase : MonoBehaviour
 
     protected void MeleeAttack()
     {
+        if (Time.time < lastMeleeTime + meleeAttackCooldown)
+        {
+            Debug.Log("Melee Attack is on cooldown.");
+            return;
+        }
+        
         // Detect enemies within melee range
         Collider2D[] enemiesHit = Physics2D.OverlapCircleAll(attackPoint.position, meleeRange, enemyLayers);
 
@@ -142,7 +146,7 @@ public abstract class FighterBase : MonoBehaviour
             if (enemyFighter != null)
             {
                 Debug.Log($"{gameObject.name} hits {enemyFighter.fighterName} with melee attack!");
-                enemyFighter.TakeDamage(meleeDamage); // Apply damage to enemy
+                enemyFighter.TakeDamage(meleeDamage);
             }
         }
 
@@ -152,6 +156,8 @@ public abstract class FighterBase : MonoBehaviour
     protected virtual void Die()
     {
         Debug.Log($"{fighterName} has died.");
+        animator.SetBool("isDead", true);
+
         if (animator != null)
         {
             PlayDeathAnimation();
@@ -161,6 +167,9 @@ public abstract class FighterBase : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    
+
 
     private void UpdateHealthSlider()
     {
@@ -237,8 +246,7 @@ public abstract class FighterBase : MonoBehaviour
 
     private void PlayDeathAnimation()
     {
-        animator.SetTrigger("DeathTrigger");
-        Destroy(gameObject);
+        animator.SetTrigger("DieTrigger");
     }
 
     private void OnDrawGizmosSelected()
