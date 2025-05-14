@@ -12,6 +12,7 @@ public abstract class FighterBase : MonoBehaviour
     [Header("UI Elements")]
     public Slider healthSlider;
     public Slider manaSlider;
+    private Sliders sliderUI;
     
     [Header("Mana System")]
     public float maxMana = 100f;
@@ -39,6 +40,7 @@ public abstract class FighterBase : MonoBehaviour
 
     private void Start()
     {
+        sliderUI = FindFirstObjectByType<Sliders>();
         animator = GetComponent<Animator>();
         statusEffectManager = GetComponent<StatusEffectManager>();
 
@@ -83,8 +85,12 @@ public abstract class FighterBase : MonoBehaviour
             currentHealth = 0;
             Die();
         }
-
-        UpdateHealthSlider();
+        if (sliderUI != null)
+        {
+            UpdateHealthSlider();
+            sliderUI.FlashHealthOnDamage();
+        }
+        
     }
 
     public abstract void Attack(FighterBase opponent);
@@ -217,7 +223,8 @@ public abstract class FighterBase : MonoBehaviour
     {
         statusEffectManager?.ApplyStun(stunDuration);
     }
-
+    
+    // Animations
     protected void PlayAttackAnimation()
     {
         animator.SetTrigger("AttackTrigger");
@@ -240,5 +247,18 @@ public abstract class FighterBase : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPoint.position, meleeRange);
+    }
+    
+    private void OnValidate()
+    {
+        if (healthSlider != null)
+        {
+            UpdateHealthSlider(); 
+        }
+        
+        if (sliderUI != null && currentHealth != maxHealth)
+        {
+            sliderUI.FlashHealthOnDamage();
+        }
     }
 }

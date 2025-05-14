@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,9 @@ public class Sliders : MonoBehaviour
 
     private Image manaFillImage;
     private Image healthFillImage;
+    
+    private Coroutine healthFlashCoroutine;
+    private bool flashHealthOnDamage = false;
 
     private float flashSpeed = 4f;
 
@@ -19,7 +23,11 @@ public class Sliders : MonoBehaviour
 
     void Update()
     {
-        UpdateSliderVisual(healthSlider, healthFillImage, Color.red, Color.green);
+        
+        if (!flashHealthOnDamage)
+        {
+            UpdateSliderVisual(healthSlider, healthFillImage, Color.red, Color.green);
+        }
         UpdateSliderVisual(manaSlider, manaFillImage, Color.red, Color.blue);
     }
 
@@ -33,7 +41,7 @@ public class Sliders : MonoBehaviour
         if (fillPercent <= 0.2f)
         {
             // Flash
-            float alpha = Mathf.Abs(Mathf.Sin(Time.time * flashSpeed));
+            float alpha = Mathf.Lerp(0.25f, 1f, Mathf.Abs(Mathf.Sin(Time.time * flashSpeed)));
             baseColor.a = alpha;
         }
         else
@@ -98,5 +106,35 @@ public class Sliders : MonoBehaviour
         }
 
         return fillImage;
+    }
+    
+    public void FlashHealthOnDamage()
+    {
+        flashHealthOnDamage = true;
+
+        if (healthFlashCoroutine != null)
+            StopCoroutine(healthFlashCoroutine);
+
+        healthFlashCoroutine = StartCoroutine(HealthDamageFlash());
+    }
+    
+    private IEnumerator HealthDamageFlash()
+    {
+        float flashDuration = 0.5f;
+        float elapsed = 0f;
+
+        while (elapsed < flashDuration)
+        {
+            float alpha = Mathf.Lerp(0.25f, 1f, Mathf.Abs(Mathf.Sin(Time.time * 20f)));
+            Color flashColor = Color.red;
+            flashColor.a = alpha;
+
+            healthFillImage.color = flashColor;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        flashHealthOnDamage = false;
     }
 }
