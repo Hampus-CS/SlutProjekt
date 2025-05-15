@@ -319,6 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5198f88741d11f49a6e7fe628741184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   fighterName: Fighter
   baseAttackPower: 10
   currentHealth: 0
@@ -332,12 +333,12 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 10
   projectileCooldown: 1
-  meleeRange: 1.5
+  meleeRange: 2.5
   meleeDamage: 10
   enemyLayers:
     serializedVersion: 2
     m_Bits: 0
-  attackPoint: {fileID: 0}
+  attackPoint: {fileID: 2718835059480899194}
   dashDistance: 5
   dashSpeed: 10
   dashCooldown: 5

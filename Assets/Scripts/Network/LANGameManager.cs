@@ -49,6 +49,12 @@ public class LANGameManager : MonoBehaviour
                     WindowsFirewallHelper.OpenHostPorts();
         #endif
         
+	    // Ensure a first save exists before display or match
+	    if (SaveManager.LoadPlayerData() == null)
+	    {
+		    SaveManager.SavePlayerData(new PlayerSaveData());
+	    }
+	    
         StartHost();
     }
 
@@ -62,6 +68,12 @@ public class LANGameManager : MonoBehaviour
                     WindowsFirewallHelper.OpenClientPorts();
         #endif
         
+	    // Ensure a first save exists before display or match
+	    if (SaveManager.LoadPlayerData() == null)
+	    {
+		    SaveManager.SavePlayerData(new PlayerSaveData());
+	    }
+	    
         StartClient();
     }
 

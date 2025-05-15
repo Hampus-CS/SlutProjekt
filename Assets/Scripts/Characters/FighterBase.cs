@@ -193,25 +193,29 @@ public abstract class FighterBase : NetworkBehaviour
 	        int kills = sessionKills;
 	        int deaths = sessionDeaths + 1;
 
-	        var gm = FindObjectOfType<GameManager>();
-	        if (gm != null)
+	        if (IsServer)
 	        {
-		        gm.FinalizeMatch(won, kills, deaths);
-		        Debug.Log("[FighterBase] FinalizeMatch called for local player (death).");
+		        // Host dying: finalize directly
+		        var gm = FindObjectOfType<GameManager>();
+		        if (gm != null)
+		        {
+			        gm.FinalizeMatch(won, kills, deaths);
+			        Debug.Log("[FighterBase] FinalizeMatch called on HOST.");
+		        }
 	        }
 	        else
 	        {
-		        Debug.LogWarning("[FighterBase] GameManager not found.");
+		        // Client dying: ask host to finalize via RPC
+		        SubmitMatchResultServerRpc(won, kills, deaths);
 	        }
-
-	        // Optional: delay before returning to menu or destroying object
-	        StartCoroutine(ReturnToMenuAfterDelay(2f));
         }
-        else
+        
+        if (!IsServer && IsOwner)
         {
-	        // Just destroy the object for remote players
-	        Destroy(gameObject);
+	        // Let client object auto-clean up after scene transition
+	        NetworkObject.Despawn(true); // true = destroy after despawn
         }
+        
     }
     
     private void UpdateHealthSlider()
@@ -316,7 +320,19 @@ public abstract class FighterBase : NetworkBehaviour
     private IEnumerator ReturnToMenuAfterDelay(float delay)
     {
 	    yield return new WaitForSeconds(delay);
-	    SceneManager.LoadScene("StartMenu");
+	    NetworkManager.Singleton.SceneManager.LoadScene("StartMenu", LoadSceneMode.Single);
     }
+    
+    [ServerRpc]
+    private void SubmitMatchResultServerRpc(bool won, int kills, int deaths)
+    {
+	    var gm = FindObjectOfType<GameManager>();
+	    if (gm != null)
+	    {
+		    gm.FinalizeMatch(won, kills, deaths);
+		    Debug.Log("[FighterBase] FinalizeMatch triggered via ServerRpc from client.");
+	    }
+    }
+
     
 }

@@ -13,11 +13,11 @@ public class SaveManager : MonoBehaviour
 
     [Header("Save Settings")]
     [SerializeField] private static readonly string SaveExtension = ".dat";
-    [SerializeField] private static string encryptionKey = "ThisIsNotThePasswordYouWant"; // Must be 32 characters for AES-256, ignore what it is called ;)
+    [SerializeField] private static string encryptionKey = "ThisKeyIsTotallyUnbreakable1234!"; // Must be 32 characters for AES-256, ignore what it is called ;)
     [SerializeField] private static bool useEncryption = true;
 
     private static string currentProfile = "Player1"; // default fallback
-
+    
     /// <summary>Set which player profile we're saving/loading for.</summary>
     public static void SetCurrentProfile(string profileName)
     {
@@ -68,10 +68,12 @@ public class SaveManager : MonoBehaviour
     {
         string filePath = GetSaveFilePath();
 
-        if (!File.Exists(filePath))
+        if (!File.Exists(filePath) || new FileInfo(filePath).Length == 0)
         {
-            Debug.Log($"[SaveManager] No existing save. Creating new data.");
-            return new PlayerSaveData();
+            Debug.Log($"[SaveManager] No valid save file found. Starting fresh.");
+            var fresh = new PlayerSaveData();
+            SavePlayerData(fresh);
+            return fresh;
         }
 
         try
@@ -114,27 +116,49 @@ public class SaveManager : MonoBehaviour
     // AES Encryption
     private static byte[] Encrypt(string plainText)
     {
-        using Aes aes = Aes.Create();
-        aes.Key = Encoding.UTF8.GetBytes(encryptionKey);
-        aes.IV = new byte[16]; // 16 zeros
+	    byte[] keyBytes = Encoding.UTF8.GetBytes(encryptionKey);
+	    if (keyBytes.Length != 32)
+	    {
+		    Debug.LogError($"[SaveManager] Invalid AES key length: {keyBytes.Length} bytes");
+		    return Array.Empty<byte>();
+	    }
 
-        using MemoryStream ms = new MemoryStream();
-        using CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
-        using StreamWriter sw = new StreamWriter(cs);
-        sw.Write(plainText);
+	    using Aes aes = Aes.Create();
+	    aes.Key = keyBytes;
+	    aes.IV = new byte[16]; // Static IV is OK for local encrypted saves
 
-        return ms.ToArray();
+	    using MemoryStream ms = new MemoryStream();
+	    using CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
+	    using StreamWriter sw = new StreamWriter(cs, Encoding.UTF8)
+	    {
+		    AutoFlush = true
+	    };
+
+	    sw.Write(plainText);
+	    sw.Flush();
+	    cs.FlushFinalBlock();
+
+	    Debug.Log($"[SaveManager] Encrypted {ms.ToArray().Length} bytes");
+
+	    return ms.ToArray();
     }
 
     private static string Decrypt(byte[] cipherBytes)
     {
-        using Aes aes = Aes.Create();
-        aes.Key = Encoding.UTF8.GetBytes(encryptionKey);
-        aes.IV = new byte[16]; // 16 zeros
+	    byte[] keyBytes = Encoding.UTF8.GetBytes(encryptionKey);
+	    if (keyBytes.Length != 32)
+	    {
+		    Debug.LogError($"[SaveManager] Invalid AES key length: {keyBytes.Length} bytes");
+		    return null;
+	    }
 
-        using MemoryStream ms = new MemoryStream(cipherBytes);
-        using CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
-        using StreamReader sr = new StreamReader(cs);
-        return sr.ReadToEnd();
+	    using Aes aes = Aes.Create();
+	    aes.Key = keyBytes;
+	    aes.IV = new byte[16];
+
+	    using MemoryStream ms = new MemoryStream(cipherBytes);
+	    using CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
+	    using StreamReader sr = new StreamReader(cs, Encoding.UTF8);
+	    return sr.ReadToEnd();
     }
 }
