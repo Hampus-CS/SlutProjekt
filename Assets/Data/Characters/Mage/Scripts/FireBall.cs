@@ -6,9 +6,12 @@ public class Fireball : MonoBehaviour
     private int totalBurnDamage = 10;
     private float burnDuration = 5f;
 
+    public Animator animator;
+
     private void Start()
     {
-        Destroy(gameObject, 10f);
+        animator = GetComponent<Animator>();
+        Destroy(gameObject, 2.5f);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

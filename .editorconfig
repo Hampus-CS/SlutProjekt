@@ -11,8 +11,7 @@ dotnet_style_allow_attributes_on_same_line = false:suggestion
 
 # Indentation and spacing
 indent_size = 4
-indent_style = space
-tab_width = 4
+indent_style = tab
 
 # New line preferences
 end_of_line = crlf

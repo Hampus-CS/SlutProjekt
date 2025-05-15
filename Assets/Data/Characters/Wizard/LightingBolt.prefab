@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 5893832817620754353}
   - component: {fileID: 7825913000458762338}
   - component: {fileID: -3908298515945151957}
-  - component: {fileID: 6019027276264282392}
   - component: {fileID: 5670893966154998710}
+  - component: {fileID: 1008941572165469030}
+  - component: {fileID: 7029247236126703213}
   m_Layer: 0
   m_Name: LightingBolt
   m_TagString: Untagged
@@ -30,8 +31,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.402493, y: -4.347315, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 3.5, y: 3.5, z: 3.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -76,11 +77,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 786919711
+  m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.5891961, g: 0.5377357, b: 1, a: 1}
+  m_Sprite: {fileID: 5185621990223152150, guid: d935d16e44eada5448a479957aea8c47, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -117,8 +118,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!58 &6019027276264282392
-CircleCollider2D:
+--- !u!114 &5670893966154998710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8913347900330227479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e489c7546ab6fe34690ab3b66daadb18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  impactDamage: 10
+  animator: {fileID: 7029247236126703213}
+--- !u!70 &1008941572165469030
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -151,19 +166,28 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
---- !u!114 &5670893966154998710
-MonoBehaviour:
+  m_Offset: {x: 0.0045590834, y: -0.017097982}
+  m_Size: {x: 0.42911926, y: 0.20249128}
+  m_Direction: 1
+--- !u!95 &7029247236126703213
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8913347900330227479}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e489c7546ab6fe34690ab3b66daadb18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  impactDamage: 10
-  stunDuration: 2
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 955c57ed3be6034448dce88d1077aad4, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
