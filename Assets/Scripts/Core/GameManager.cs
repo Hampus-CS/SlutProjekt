@@ -8,12 +8,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-
-    [Header("References")]
-    public SaveManager saveManager;
-    public FighterBase player1;
-    public FighterBase player2;
-
+    
     private void Awake()
     {
         // To ensure one GameManager exists
@@ -27,80 +22,64 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    void Start()
-    {
-        if (saveManager == null)
-            Debug.LogWarning("[GameManager] SaveManager not assigned!");
-        
-        LoadPlayerScores();
-    }
-
+    
     /// <summary>
-    /// Called when a match ends — updates score and logs results.
-    /// Only host/offline players may update scores.
+    /// Called by server when the match ends.  Pass the winning player's ClientId.
     /// </summary>
-    public void EndMatch(FighterBase winner, FighterBase loser) // WIP
+    public void EndMatchServer(ulong winnerClientId)
     {
-        Debug.Log($"[GameManager] {winner.fighterName} wins the match against {loser.fighterName}!");
+        if (!IsServer) return;
 
-        if (saveManager != null && IsHostOrOffline())
-        {
-            try
-            {
-                int oldScore = saveManager.LoadPlayerScore(winner.fighterName);
-                saveManager.SavePlayerScore(winner.fighterName, oldScore + 1);
-                Debug.Log($"[GameManager] Updated score for {winner.fighterName} to {oldScore + 1}");
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"[GameManager] Failed to save score: {ex.Message}");
-            }
-        }
-
-        // TODO: Trigger rematch, show UI, or reload scene
+        // Broadcast to each client whether they won
+        EndMatchClientRpc(winnerClientId);
     }
 
+    [ClientRpc]
+    private void EndMatchClientRpc(ulong winnerClientId, ClientRpcParams rpcParams = default)
+    {
+        bool didIWin = NetworkManager.Singleton.LocalClientId == winnerClientId;
+
+        // Grab local session stats from FighterBase
+        int kills  = FighterBase.sessionKills;
+        int deaths = FighterBase.sessionDeaths;
+
+        // Record them locally
+        SaveManager.Instance.SaveMatchResult(kills, deaths, didIWin);
+
+        Debug.Log($"[GameManager] Client {NetworkManager.Singleton.LocalClientId} " +
+                  $"Match Over (Win? {didIWin}) -- Kills: {kills}, Deaths: {deaths}");
+
+        // Reset for next match
+        FighterBase.sessionKills  = 0;
+        FighterBase.sessionDeaths = 0;
+
+        // Optionally load all-time stats and display
+        var allStats = SaveManager.Instance.LoadStats();
+        Debug.Log($"[All-Time Stats] Matches: {allStats.matchesPlayed}, " +
+                  $"Wins: {allStats.totalWins}, Losses: {allStats.totalLosses}, " +
+                  $"Kills: {allStats.totalKills}, Deaths: {allStats.totalDeaths}");
+
+        // TODO: transition back to lobby or show rematch UI hereâ€¦
+    }
     /// <summary>
-    /// Loads and logs scores at the beginning of a match.
+    /// Call this on the host when you detect the match winner (e.g. via health checks).
     /// </summary>
-    void LoadPlayerScores() // WIP
+    public void DeclareWinner(ulong winningClientId)
     {
-        if (saveManager == null) return;
-
-        try
-        {
-            int p1Score = saveManager.LoadPlayerScore(player1.fighterName);
-            int p2Score = saveManager.LoadPlayerScore(player2.fighterName);
-            Debug.Log($"[GameManager] {player1.fighterName} Score: {p1Score} | {player2.fighterName} Score: {p2Score}");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"[GameManager] Failed to load player scores: {ex.Message}");
-        }
+        if (IsServer)
+            EndMatchServer(winningClientId);
     }
 
     /// <summary>
-    /// Utility to check if we are host or running offline (no networking).
-    /// </summary>
-    private bool IsHostOrOffline()
-    {
-        if (NetworkManager.Singleton == null)
-            return true;
-
-        return NetworkManager.Singleton.IsHost || !NetworkManager.Singleton.IsClient;
-    }
-
-    /// <summary>
-    /// Call this to manually start a match if needed.
+    /// Reset fighters' health, session stats, etc., to start a new match.
     /// </summary>
     public void StartMatch()
     {
-        Debug.Log("[GameManager] Match started!");
+        FighterBase.sessionKills  = 0;
+        FighterBase.sessionDeaths = 0;
 
-        // Optional: Reset fighters, UI, power-ups etc.
+        // References to the fighters, heal them:
         player1.currentHealth = player1.maxHealth;
         player2.currentHealth = player2.maxHealth;
     }
-
 }

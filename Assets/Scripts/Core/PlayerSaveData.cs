@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 
 /// <summary>
 /// Serializable save data structure to track player scores.
@@ -7,31 +7,26 @@
 [System.Serializable]
 public class PlayerSaveData
 {
-    public List<PlayerEntry> scores = new();
-
-    public void SetScore(string playerID, int score)
+    
+    [Header("Stats")]
+    [SerializeField] private int totalKills      = 0;
+    [SerializeField] private int totalDeaths     = 0;
+    [SerializeField] private int totalWins       = 0;
+    [SerializeField] private int totalLosses     = 0;
+    [SerializeField] private int matchesPlayed   = 0;
+    
+    /// <summary>
+    /// Call once per match to update cumulative stats.
+    /// </summary>
+    /// <param name="kills">Kills in this match</param>
+    /// <param name="deaths">Deaths in this match</param>
+    /// <param name="won">True if this match was won</param>
+    public void RegisterMatch(int kills, int deaths, bool won)
     {
-        var existing = scores.Find(e => e.playerID == playerID);
-        if (existing != null)
-        {
-            existing.score = score;
-        }
-        else
-        {
-            scores.Add(new PlayerEntry { playerID = playerID, score = score });
-        }
+        matchesPlayed++;
+        totalKills  += kills;
+        totalDeaths += deaths;
+        if (won) totalWins++;
+        else totalLosses++;
     }
-
-    public int GetScore(string playerID)
-    {
-        var existing = scores.Find(e => e.playerID == playerID);
-        return existing != null ? existing.score : 0;
-    }
-}
-
-[System.Serializable]
-public class PlayerEntry
-{
-    public string playerID;
-    public int score;
 }

@@ -6,12 +6,13 @@ using Unity.Netcode;
 using UnityEngine;
 //using Unity.Netcode;
 
-public class SaveManager : MonoBehaviour // WIP
+public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
 
-    private readonly string saveFileName = "player_save.dat";
-    private readonly string encryptionKey = "temp1234"; // You can generate a stronger one
+    private readonly string BaseFileName = "player_stats";
+    private readonly string FileExt = ".dat";
+    private readonly string encryptionKey = "temp1234"; // Generate a stronger one at a later moment
 
     private void Awake()
     {
@@ -27,61 +28,63 @@ public class SaveManager : MonoBehaviour // WIP
     }
 
     /// <summary>
-    /// Saves player data to an encrypted file (host or offline only).
+    /// Save the result of a single match for this local client.
+    /// Each client writes to its own file named player_stats_{clientId}.dat
     /// </summary>
-    public void SavePlayerScore(string playerID, int score)
+    public void SaveMatchResult(int kills, int deaths, bool won)
     {
-        if (!IsHostOrOffline()) return;
-
         try
         {
-            string path = GetSavePath();
-            PlayerSaveData saveData = LoadAllData();
-            saveData.SetScore(playerID, score);
+            ulong clientId = NetworkManager.Singleton?.LocalClientId ?? 0;
+            string path = GetSavePath(clientId);
 
-            string json = JsonUtility.ToJson(saveData, prettyPrint: false);
+            // load existing data or create new
+            PlayerSaveData data = File.Exists(path) ? JsonUtility.FromJson<PlayerSaveData>(Decrypt(File.ReadAllText(path))) : new PlayerSaveData();
+
+            // register this match
+            data.RegisterMatch(kills, deaths, won);
+
+            // serialize, encrypt, write
+            string json = JsonUtility.ToJson(data);
             string encrypted = Encrypt(json);
             File.WriteAllText(path, encrypted);
 
-            Debug.Log($"[SaveManager] Saved encrypted score for {playerID}: {score}");
+            Debug.Log($"[SaveManager] (Client {clientId}) Saved stats: +{kills}k +{deaths}d won:{won}");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[SaveManager] Save failed for {playerID}: {ex.Message}");
+            Debug.LogError($"[SaveManager] Save failed: {ex}");
         }
     }
 
     /// <summary>
-    /// Loads the saved score for a specific player.
+    /// Load the cumulative stats for this local client.
     /// </summary>
-    public int LoadPlayerScore(string playerID)
+    public PlayerSaveData LoadStats()
     {
         try
         {
-            PlayerSaveData saveData = LoadAllData();
-            return saveData.GetScore(playerID);
+            ulong clientId = NetworkManager.Singleton?.LocalClientId ?? 0;
+            string path = GetSavePath(clientId);
+            if (!File.Exists(path))
+                return new PlayerSaveData();
+
+            string encrypted = File.ReadAllText(path);
+            return JsonUtility.FromJson<PlayerSaveData>(Decrypt(encrypted));
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[SaveManager] Load failed for {playerID}: {ex.Message}");
-            return 0;
+            Debug.LogError($"[SaveManager] Load failed: {ex}");
+            return new PlayerSaveData();
         }
     }
-
-    // Internal: Loads and decrypts the full save data
-    private PlayerSaveData LoadAllData()
+    
+    private string GetSavePath(ulong clientId)
     {
-        string path = GetSavePath();
-        if (!File.Exists(path))
-        {
-            return new PlayerSaveData(); // Return empty if no file
-        }
-
-        string encrypted = File.ReadAllText(path);
-        string json = Decrypt(encrypted);
-        return JsonUtility.FromJson<PlayerSaveData>(json);
+        string fileName = $"{BaseFileName}_{clientId}{FileExt}";
+        return Path.Combine(Application.persistentDataPath, fileName);
     }
-
+    
     // Encryption using AES
     private string Encrypt(string plainText)
     {
@@ -106,17 +109,4 @@ public class SaveManager : MonoBehaviour // WIP
         byte[] decrypted = decryptor.TransformFinalBlock(input, 0, input.Length);
         return Encoding.UTF8.GetString(decrypted);
     }
-
-    private string GetSavePath()
-    {
-        return Path.Combine(Application.persistentDataPath, saveFileName);
-    }
-
-    private bool IsHostOrOffline()
-    {
-        if (NetworkManager.Singleton == null)
-            return true;
-        return NetworkManager.Singleton.IsHost || !NetworkManager.Singleton.IsClient;
-    }
-
 }

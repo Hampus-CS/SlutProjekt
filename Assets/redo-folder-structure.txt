@@ -1,0 +1,92 @@
+Exempel:
+Assets/
+├── Characters/
+│   ├── FighterBase.cs
+│   ├── Warrior/
+│   │   ├── Art/
+│   │   │   ├── Sprites/
+│   │   │   │   └── warrior_idle.png, warrior_attack.png, …
+│   │   │   └── Animations/
+│   │   │       ├── Warrior_Idle.anim
+│   │   │       └── Warrior_Attack.anim
+│   │   ├── Prefabs/
+│   │   │   └── Warrior.prefab
+│   │   └── Scripts/
+│   │       └── Warrior.cs
+│   ├── Mage/
+│   │   ├── Art/
+│   │   │   ├── Sprites/
+│   │   │   └── Animations/
+│   │   ├── Prefabs/
+│   │   │   └── Mage.prefab
+│   │   └── Scripts/
+│   │       └── Mage.cs
+│   ├── Samurai/
+│   │   ├── Art/
+│   │   │   ├── Sprites/
+│   │   │   └── Animations/
+│   │   ├── Prefabs/
+│   │   │   └── Samurai.prefab
+│   │   └── Scripts/
+│   │       └── Samurai.cs
+│   └── Wizard/
+│       ├── Art/
+│       │   ├── Sprites/
+│       │   └── Animations/
+│       ├── Prefabs/
+│       │   └── Wizard.prefab
+│       └── Scripts/
+│           └── Wizard.cs
+│
+├── Scenes/
+│   ├── CharacterSelect/
+│   │   ├── Art/                       ← UI‐specific icons, backgrounds
+│   │   ├── Prefabs/                   ← panel roots, button prefabs
+│   │   ├── Scenes/
+│   │   │   └── CharacterSelect.unity
+│   │   └── Scripts/
+│   │       ├── CharacterCarouselSelector.cs
+│   │       ├── CharacterDetailDisplay.cs
+│   │       └── CharacterSelectionManager.cs
+│   └── FightScene/
+│       ├── Art/                       ← arena backgrounds, effects
+│       ├── Prefabs/                   ← spawn points, HUD canvas prefab
+│       ├── Scenes/
+│       │   └── FightScene.unity
+│       └── Scripts/
+│           ├── FightSpawner.cs
+│           ├── PlayerStats.cs
+│           └── HUDManager.cs
+│
+├── UI/                               ← cross-scene shared UI elements
+│   ├── Art/
+│   ├── Prefabs/
+│   │   ├── Button.prefab
+│   │   └── Slider.prefab
+│   └── Scripts/
+│       └── PanelTransition.cs
+│
+├── Networking/                       ← all NGO config and scripts
+│   ├── Prefabs/
+│   │   ├── SelectionNetworkController.prefab
+│   │   └── DummyPlayer.prefab        ← optional if you use PlayerObject
+│   └── Scripts/
+│       ├── SelectionNetworkController.cs
+│       ├── SelectionNetworkBootstrap.cs
+│       └── LANGameManager.cs
+│
+├── Core/                            ← utility code and third-party plugins
+│   ├── Scripts/
+│   │   ├── Extensions/
+│   │   └── Helpers/
+│   └── Plugins/
+│
+├── ScriptableObjects/
+│   └── CharacterData/
+│       ├── WarriorData.asset
+│       ├── MageData.asset
+│       └── etc…
+│
+└── Audio/
+    ├── Music/
+    └── SFX/

@@ -36,6 +36,10 @@ public abstract class FighterBase : MonoBehaviour
     private float meleeAttackCooldown = 1f;
     private float lastMeleeTime = -Mathf.Infinity;
 
+    // Session stats (local only)
+    public static int sessionKills   = 0;
+    public static int sessionDeaths  = 0;
+    
     public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
     public PlayerMove PlayerMove => GetComponent<PlayerMove>();
 
@@ -44,7 +48,6 @@ public abstract class FighterBase : MonoBehaviour
 
     private void Start()
     {
-        // 1) Find your singleton HUD sliders and bind them if this is the local player's object
         var netObj = GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsOwner)
         {
@@ -52,7 +55,6 @@ public abstract class FighterBase : MonoBehaviour
             manaSlider   = HUDManager.Instance.ManaSlider;
         }
         
-        // 2) (Optional) If you're using that Sliders helper, keep it—otherwise you can remove it
         sliderUI = FindFirstObjectByType<Sliders>();
         animator = GetComponent<Animator>();
         statusEffectManager = GetComponent<StatusEffectManager>();
@@ -60,7 +62,6 @@ public abstract class FighterBase : MonoBehaviour
         currentHealth = maxHealth;
         currentMana = maxMana;
         
-        // 3) Now initialize the sliders on the canvas via your fields
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
@@ -97,6 +98,9 @@ public abstract class FighterBase : MonoBehaviour
         if (currentHealth <= 0)
         {
             currentHealth = 0;
+            var net = GetComponent<NetworkObject>();
+            if (net != null && net.IsOwner)
+                sessionDeaths++;
             Die();
         }
         if (sliderUI != null)
@@ -127,7 +131,7 @@ public abstract class FighterBase : MonoBehaviour
 
             if (rb != null)
             {
-                float direction = transform.localScale.x < 0 ? 1f : -1f;
+                float direction = transform.localScale.x < 0 ? -1f : 1f;
                 rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
             }
 
@@ -157,6 +161,12 @@ public abstract class FighterBase : MonoBehaviour
             if (enemyFighter != null)
             {
                 Debug.Log($"{gameObject.name} hits {enemyFighter.fighterName} with melee attack!");
+                if (enemyFighter.currentHealth == 0)
+                {
+                    var net = GetComponent<NetworkObject>();
+                    if (net != null && net.IsOwner)
+                        sessionKills++;
+                }
                 enemyFighter.TakeDamage(meleeDamage);
             }
         }
