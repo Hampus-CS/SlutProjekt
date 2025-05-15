@@ -30,6 +30,11 @@ public class Warrior : FighterBase
                 Debug.Log($"{fighterName}'s crit expired!");
             }
         }
+        
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Attack(null);   
+        }
     }
 
     private void Crit()

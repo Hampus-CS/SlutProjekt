@@ -62,7 +62,6 @@ public class PlayerMove : NetworkBehaviour
         {
             moveDirection = Vector2.right;
         }
-
         else if (movingLeft && movingRight)
         {
             moveDirection = Vector2.zero; // Stop if both keys are pressed
@@ -125,15 +124,7 @@ public class PlayerMove : NetworkBehaviour
         float targetSpeed = moveDirection.x * moveSpeed;
         float speedDiff = targetSpeed - rb.linearVelocity.x;
 
-        float accelRate;
-        if (moveDirection != Vector2.zero)
-        {
-            accelRate = acceleration;
-        }
-        else
-        {
-            accelRate = deceleration;
-        }
+        float accelRate = moveDirection != Vector2.zero ? acceleration : deceleration;
 
         float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
 
