@@ -31,7 +31,7 @@ public class Warrior : FighterBase
             }
         }
         
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetMouseButtonDown(0))
         {
             Attack(null);   
         }

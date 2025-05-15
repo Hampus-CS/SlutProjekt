@@ -28,9 +28,9 @@ public class Mage : FighterBase
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-         Attack(null);   
+        if (Input.GetMouseButtonDown(0))
+        { 
+            Attack(null);   
         }
     }
 
@@ -41,12 +41,7 @@ public class Mage : FighterBase
             GameObject fireball = Instantiate(fireballPrefab, firePoint.position, Quaternion.identity);
             Rigidbody2D rb = fireball.GetComponent<Rigidbody2D>();
 
-            float direction = 1f;
-            if (transform.localScale.x < 0)
-            {
-                direction = -1f;
-            }
-
+            float direction = transform.localScale.x < 0 ? 1f : -1f;
             rb.linearVelocity = new Vector2(direction * fireballSpeed, 0f);
 
             Vector3 scale = fireball.transform.localScale;

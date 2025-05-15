@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Wizard : FighterBase
 {
-    [Header("Wizzard Settings")]
+    [Header("Wizard Settings")]
     public GameObject lightningBoltPrefab;
 
     [Header("Lightning Bolt")]
@@ -29,13 +29,18 @@ public class Wizard : FighterBase
                 Debug.Log("Not enough mana!");
             }
         }
+        
+        if (Input.GetMouseButtonDown(0))
+        {
+            Attack(null);   
+        }
     }
 
     void ShootLightningBolt()
     {
         if (animator != null)
         {
-            animator.SetTrigger("Ability");
+            animator.SetTrigger("AbilityTrigger");
         }
 
         if (lightningBoltPrefab != null && firePoint != null)
@@ -43,16 +48,7 @@ public class Wizard : FighterBase
             GameObject lightningBolt = Instantiate(lightningBoltPrefab, firePoint.position, Quaternion.identity);
             Rigidbody2D rb = lightningBolt.GetComponent<Rigidbody2D>();
 
-            float direction;
-            if (transform.localScale.x > 0)
-            {
-                direction = 1f;
-            }
-            else
-            {
-                direction = -1f;
-            }
-
+            float direction = transform.localScale.x < 0 ? 1f : -1f;
             rb.linearVelocity = new Vector2(direction * lightningBoltSpeed, 0f);
 
             Vector3 scale = lightningBolt.transform.localScale;

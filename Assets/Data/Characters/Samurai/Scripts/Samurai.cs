@@ -36,7 +36,7 @@ public class Samurai : FighterBase
             }
         }
         
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetMouseButtonDown(0))
         {
             Attack(null);   
         }

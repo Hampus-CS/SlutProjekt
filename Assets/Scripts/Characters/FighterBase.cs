@@ -125,7 +125,7 @@ public abstract class FighterBase : MonoBehaviour
         Debug.Log("Shoot");
         if (magicBoltPrefab != null && firePoint != null)
         {
-            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, firePoint.rotation);
+            GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, Quaternion.Euler(0, 0, 90));
 
             Rigidbody2D rb = bolt.GetComponent<Rigidbody2D>();
 
