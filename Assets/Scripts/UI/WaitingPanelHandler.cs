@@ -1,4 +1,9 @@
+using System.Collections;
+using System.Net.NetworkInformation;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Ping = UnityEngine.Ping;
 
 /// <summary>
 /// Handles showing and hiding waiting and connecting panels during LAN matchmaking.
@@ -8,7 +13,12 @@ public class WaitingPanelHandler : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private GameObject waitingPanel;      // Shown while hosting, waiting for player
     [SerializeField] private GameObject connectingPanel;   // Shown while joining, waiting for host response
-
+    
+    private void Start()
+    {
+        HideAllPanels();
+    }
+    
     /// <summary>
     /// Show the "Waiting for Opponent..." panel.
     /// </summary>
@@ -44,4 +54,5 @@ public class WaitingPanelHandler : MonoBehaviour
         if (connectingPanel != null)
             connectingPanel.SetActive(false);
     }
+    
 }

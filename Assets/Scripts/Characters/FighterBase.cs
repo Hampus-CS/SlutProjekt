@@ -99,8 +99,6 @@ public abstract class FighterBase : MonoBehaviour
         {
             currentHealth = 0;
             var net = GetComponent<NetworkObject>();
-            if (net != null && net.IsOwner)
-                sessionDeaths++;
             Die();
         }
         if (sliderUI != null)
@@ -164,8 +162,6 @@ public abstract class FighterBase : MonoBehaviour
                 if (enemyFighter.currentHealth == 0)
                 {
                     var net = GetComponent<NetworkObject>();
-                    if (net != null && net.IsOwner)
-                        sessionKills++;
                 }
                 enemyFighter.TakeDamage(meleeDamage);
             }
