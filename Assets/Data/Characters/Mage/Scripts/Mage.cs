@@ -11,6 +11,8 @@ public class Mage : FighterBase
 
 	void Update()
 	{
+		if (!IsOwner) return;
+		
 		if (statusEffectManager.IsStunned()) return;
 
 		if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastFireballTime + fireballCooldown)

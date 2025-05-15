@@ -17,7 +17,9 @@ public class Samurai : FighterBase
 
     private void Update()
     {
-        if (statusEffectManager.IsStunned() || isPerformingAbility) return;
+	    if (!IsOwner) return;
+	    
+	    if (statusEffectManager.IsStunned() || isPerformingAbility) return;
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastDashTime + dashCooldown && !isDashing &&
             !isPerformingAbility)
@@ -72,7 +74,7 @@ public class Samurai : FighterBase
                 if (opponent != null && opponent != this)
                 {
                     // Apply damage, knockback, and stun to the opponent
-                    opponent.TakeDamage(dashDamage);
+                    opponent.TakeDamage(dashDamage, this);
 
                     Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
                     if (opponentRb != null)

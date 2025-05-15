@@ -2,8 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
-public abstract class FighterBase : MonoBehaviour
+public abstract class FighterBase : NetworkBehaviour
 {
     [Header("Base Stats")]
     public string fighterName = "Fighter";
@@ -89,7 +90,7 @@ public abstract class FighterBase : MonoBehaviour
         UpdateManaSlider();
     }
 
-    public virtual void TakeDamage(int amount)
+    public virtual void TakeDamage(int amount, FighterBase attacker)
     {
         PlayDamageAnimation();
         currentHealth -= amount;
@@ -97,9 +98,15 @@ public abstract class FighterBase : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            currentHealth = 0;
-            var net = GetComponent<NetworkObject>();
-            Die();
+	        currentHealth = 0;
+
+	        if (attacker != null && attacker.IsOwner)
+	        {
+		        sessionKills++;
+		        Debug.Log($"[FighterBase] {attacker.fighterName} gains a kill!");
+	        }
+
+	        Die();
         }
         if (sliderUI != null)
         {
@@ -163,7 +170,7 @@ public abstract class FighterBase : MonoBehaviour
                 {
                     var net = GetComponent<NetworkObject>();
                 }
-                enemyFighter.TakeDamage(meleeDamage);
+                enemyFighter.TakeDamage(meleeDamage, this);
             }
         }
 
@@ -173,21 +180,40 @@ public abstract class FighterBase : MonoBehaviour
     protected virtual void Die()
     {
         Debug.Log($"{fighterName} has died.");
-        animator.SetBool("isDead", true);
-
+        
         if (animator != null)
         {
-            PlayDeathAnimation();
+	        animator.SetBool("isDead", true);
+	        PlayDeathAnimation();
+        }
+
+        if (IsOwner)
+        {
+	        bool won = false;
+	        int kills = sessionKills;
+	        int deaths = sessionDeaths + 1;
+
+	        var gm = FindObjectOfType<GameManager>();
+	        if (gm != null)
+	        {
+		        gm.FinalizeMatch(won, kills, deaths);
+		        Debug.Log("[FighterBase] FinalizeMatch called for local player (death).");
+	        }
+	        else
+	        {
+		        Debug.LogWarning("[FighterBase] GameManager not found.");
+	        }
+
+	        // Optional: delay before returning to menu or destroying object
+	        StartCoroutine(ReturnToMenuAfterDelay(2f));
         }
         else
         {
-            Destroy(gameObject);
+	        // Just destroy the object for remote players
+	        Destroy(gameObject);
         }
     }
-
     
-
-
     private void UpdateHealthSlider()
     {
         if (healthSlider != null)
@@ -286,4 +312,11 @@ public abstract class FighterBase : MonoBehaviour
             sliderUI.FlashHealthOnDamage();
         }
     }
+    
+    private IEnumerator ReturnToMenuAfterDelay(float delay)
+    {
+	    yield return new WaitForSeconds(delay);
+	    SceneManager.LoadScene("StartMenu");
+    }
+    
 }

@@ -4,6 +4,8 @@ public class MagicBolt : MonoBehaviour
 {
     public int damage = 10;
 
+    public FighterBase attacker;
+    
     private void Start()
     {
         Destroy(gameObject, 2.5f);
@@ -14,7 +16,7 @@ public class MagicBolt : MonoBehaviour
         FighterBase target = other.GetComponent<FighterBase>();
         if (target != null)
         {
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, attacker);
         }
         
         Destroy(gameObject);

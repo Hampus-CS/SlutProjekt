@@ -8,6 +8,8 @@ public class LightningBolt : MonoBehaviour
     [SerializeField]
     private Animator animator;
 
+    public FighterBase attacker;
+    
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -19,7 +21,7 @@ public class LightningBolt : MonoBehaviour
         FighterBase target = other.GetComponent<FighterBase>();
         if (target != null)
         {
-            target.TakeDamage(impactDamage);
+            target.TakeDamage(impactDamage, attacker);
             target.ApplyStun(stunDuration);
             Destroy(gameObject);
         }

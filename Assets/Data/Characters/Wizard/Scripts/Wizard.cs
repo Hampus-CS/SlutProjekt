@@ -13,7 +13,9 @@ public class Wizard : FighterBase
 
     private void Update()
     {
-        if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
+	    if (!IsOwner) return;
+	    
+	    if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
 
         // Lightning bolt cooldown and mana check
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastLightningBoltTime + lightningBoltCooldown)

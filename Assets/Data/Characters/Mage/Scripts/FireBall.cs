@@ -8,6 +8,8 @@ public class Fireball : MonoBehaviour
 
     public Animator animator;
 
+    public FighterBase attacker;
+    
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -19,7 +21,7 @@ public class Fireball : MonoBehaviour
         FighterBase target = other.GetComponent<FighterBase>();
         if (target != null)
         {
-            target.TakeDamage(impactDamage);
+            target.TakeDamage(impactDamage, attacker);
             target.ApplyBurn(totalBurnDamage, burnDuration);
             Destroy(gameObject);
         }

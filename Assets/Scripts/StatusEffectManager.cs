@@ -113,7 +113,7 @@ public class StatusEffectManager : MonoBehaviour
             if (damageAccumulated >= 1f)
             {
                 int damageToApply = Mathf.FloorToInt(damageAccumulated);
-                fighter.TakeDamage(damageToApply);
+                fighter.TakeDamage(damageToApply, fighter);
                 damageAccumulated -= damageToApply;
                 Debug.Log($"{fighter.fighterName} takes {damageToApply} burn damage!");
             }

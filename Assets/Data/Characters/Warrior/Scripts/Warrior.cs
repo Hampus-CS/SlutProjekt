@@ -14,7 +14,9 @@ public class Warrior : FighterBase
 
     private void Update()
     {
-        if (statusEffectManager.IsStunned()) return;
+	    if (!IsOwner) return;
+	    
+	    if (statusEffectManager.IsStunned()) return;
 
         if (Input.GetKeyDown(KeyCode.Space)&& Time.time >= lastCritTime + critCooldown)
         {
@@ -62,7 +64,7 @@ public class Warrior : FighterBase
             Debug.Log($"{fighterName} lands a crit!");
         }
 
-        opponent.TakeDamage(damage);
+        opponent.TakeDamage(damage, this);
         Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
     }
 }
