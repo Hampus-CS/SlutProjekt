@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Serializable save data structure to track player scores.
-/// Can be expanded to include more persistent stats (e.g., kills, settings, etc.)
+/// Stores all match statistics for a player. Uses encapsulation to protect data access.
 /// </summary>
 [System.Serializable]
 public class PlayerSaveData
@@ -15,18 +14,35 @@ public class PlayerSaveData
     [SerializeField] private int totalLosses     = 0;
     [SerializeField] private int matchesPlayed   = 0;
     
-    /// <summary>
-    /// Call once per match to update cumulative stats.
-    /// </summary>
-    /// <param name="kills">Kills in this match</param>
-    /// <param name="deaths">Deaths in this match</param>
-    /// <param name="won">True if this match was won</param>
-    public void RegisterMatch(int kills, int deaths, bool won)
+    // Public read-only access
+    public int TotalKills     => totalKills;
+    public int TotalDeaths    => totalDeaths;
+    public int TotalWins      => totalWins;
+    public int TotalLosses    => totalLosses;
+    public int MatchesPlayed  => matchesPlayed;
+    
+    /// <summary>Called at the end of a match to update statistics.</summary>
+    public void RecordMatch(int kills, int deaths, bool won)
     {
-        matchesPlayed++;
-        totalKills  += kills;
-        totalDeaths += deaths;
-        if (won) totalWins++;
-        else totalLosses++;
+        totalKills    += kills;
+        totalDeaths   += deaths;
+        matchesPlayed += 1;
+
+        if (won)
+            totalWins++;
+        else
+            totalLosses++;
+    }
+
+    /// <summary>Resets all stats to zero.</summary>
+    public void ResetAll()
+    {
+        totalKills = totalDeaths = totalWins = totalLosses = matchesPlayed = 0;
+    }
+
+    /// <summary>Returns a short summary of current stats.</summary>
+    public override string ToString()
+    {
+        return $"Matches: {matchesPlayed} | Wins: {totalWins} | Losses: {totalLosses} | Kills: {totalKills} | Deaths: {totalDeaths}";
     }
 }

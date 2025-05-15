@@ -16,7 +16,7 @@ public class LANGameManager : MonoBehaviour
     [SerializeField] private Button joinButton;
     [SerializeField] private TMP_InputField ipInputField;
     [SerializeField] private GameObject waitingPanel;
-    [SerializeField] private GameObject connectingPanel;
+// Open Windows-Firewall ports on Windows builds (UAC first run)    [SerializeField] private GameObject connectingPanel;
     [SerializeField] private WaitingPanelHandler waitingHandler;
 
     [Header("Broadcast References")]
@@ -43,20 +43,30 @@ public class LANGameManager : MonoBehaviour
 
     private void OnHostClicked()
     {
+        SaveManager.SetCurrentProfile("Player1");
+
+        #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+                    WindowsFirewallHelper.OpenHostPorts();
+        #endif
+        
         StartHost();
     }
 
     private void OnJoinClicked()
     {
+        
+        SaveManager.SetCurrentProfile("Player2");
+
+        // Open Windows-Firewall ports on Windows builds (UAC first run)
+        #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+                    WindowsFirewallHelper.OpenClientPorts();
+        #endif
+        
         StartClient();
     }
 
     private void StartHost()
     {
-        // Open Windows-Firewall ports on Windows builds (UAC first run)
-        #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            WindowsFirewallHelper.OpenHostPorts();
-        #endif
         
         transport.SetConnectionData("0.0.0.0", port);
         NetworkManager.Singleton.StartHost();
@@ -82,10 +92,6 @@ public class LANGameManager : MonoBehaviour
 
     private void StartClient()
     {
-        // Open Windows-Firewall ports on Windows builds (UAC first run)
-        #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            WindowsFirewallHelper.OpenClientPorts();
-        #endif
         
         if (waitingHandler != null)
             waitingHandler.ShowConnectingPanel();
