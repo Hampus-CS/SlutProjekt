@@ -470,7 +470,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -1632,8 +1632,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0797a0752fb812647a64b07216721fc0, type: 2}
   - {fileID: 11400000, guid: f39c7fec0d994a54699c83eaf926c851, type: 2}
   spawnPoints:
-  - {fileID: 1197820058}
   - {fileID: 504401164}
+  - {fileID: 1197820058}
 --- !u!4 &1924260750
 Transform:
   m_ObjectHideFlags: 0

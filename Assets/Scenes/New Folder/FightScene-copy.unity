@@ -1114,6 +1114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manaSlider: {fileID: 655239925}
   healthSlider: {fileID: 1874495975}
+  flashPrecent: 0.3
 --- !u!4 &1583185583
 Transform:
   m_ObjectHideFlags: 0
@@ -1423,7 +1424,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 644459261}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
+  m_MaxValue: 100
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -1559,7 +1560,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7598995029456177201, guid: 897db42b462e1304ba1b7313c7216ece, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3557498388
+      value: 4098527105
       objectReference: {fileID: 0}
     - target: {fileID: 7598995029456177201, guid: 897db42b462e1304ba1b7313c7216ece, type: 3}
       propertyPath: SceneMigrationSynchronization

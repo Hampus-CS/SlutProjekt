@@ -35,6 +35,11 @@ public class Samurai : FighterBase
                 isDashing = false;
             }
         }
+        
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Attack(null);   
+        }
     }
 
     private void StartDashPierce()
