@@ -347,6 +347,7 @@ MonoBehaviour:
   knockbackForce: 5
   stunDuration: 0.5
   lastDashTime: 0
+  ghostPrefab: {fileID: 5251138399461381211, guid: d3d62b68455a32d4ba84d521253b0b98, type: 3}
 --- !u!114 &2503597120066714775
 MonoBehaviour:
   m_ObjectHideFlags: 0

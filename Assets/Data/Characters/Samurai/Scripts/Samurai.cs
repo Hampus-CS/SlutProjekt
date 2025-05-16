@@ -12,7 +12,10 @@ public class Samurai : FighterBase
 	public float lastDashTime;
 	private bool isDashing = false;
 	private bool isPerformingAbility = false;
+	private bool hasDashedHit;
 
+	private Collider2D mainCollider;
+	
 	private BoxCollider2D leftWallCollider;
 	private BoxCollider2D rightWallCollider;
 	private BoxCollider2D floorCollider;
@@ -23,11 +26,12 @@ public class Samurai : FighterBase
 	
 	public GameObject ghostPrefab;
 	private GhostSpawner ghostSpawner;
-
+	
 	private void Start()
 	{
 		ghostSpawner = GetComponent<GhostSpawner>();
 		rb = GetComponent<Rigidbody2D>();
+		rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 		animator = GetComponent<Animator>();
 		
 		// Auto-assign colliders from scene
@@ -35,6 +39,8 @@ public class Samurai : FighterBase
 		rightWallCollider = GameObject.Find("RightWall")?.GetComponent<BoxCollider2D>();
 		floorCollider = GameObject.Find("Floor")?.GetComponent<BoxCollider2D>();
 
+		mainCollider = GetComponent<Collider2D>();
+		
 		if (leftWallCollider == null || rightWallCollider == null || floorCollider == null)
 		{
 			Debug.LogError("One or more wall/floor colliders are missing!");
@@ -53,98 +59,111 @@ public class Samurai : FighterBase
 	{
 		if (!isDashing)
 		{
+			hasDashedHit = false;
 			StartCoroutine(DashCoroutine());
 		}
 	}
 
 	private IEnumerator DashCoroutine()
-{
-    isDashing = true;
-    isPerformingAbility = true;
-    lastDashTime = Time.time;
+	{
+		mainCollider.isTrigger = true;
+		
+		isDashing = true;
+	    isPerformingAbility = true;
+	    lastDashTime = Time.time;
 
-    if (animator != null)
-        animator.SetTrigger("Ability");
+	    if (animator != null)
+	        animator.SetTrigger("Ability");
 
-    // Change layer so player can pass through enemies
-    gameObject.layer = LayerMask.NameToLayer("NoCollision");
+	    // Change layer so player can pass through enemies
+	    gameObject.layer = LayerMask.NameToLayer("NoCollision");
 
-    if (rb != null)
-        rb.gravityScale = 0f;
+	    if (rb != null)
+	        rb.gravityScale = 0f;
 
-    Vector2 dashDirection = transform.localScale.x < 0 ? Vector2.left : Vector2.right;
-    dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
+	    Vector2 dashDirection = transform.localScale.x < 0 ? Vector2.left : Vector2.right;
+	    dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
 
-    // Clamp dashTarget inside arena bounds
-    float minX = leftWallCollider.bounds.max.x;
-    float maxX = rightWallCollider.bounds.min.x;
-    float minY = floorCollider.bounds.max.y;
+	    // Clamp dashTarget inside arena bounds
+	    float minX = leftWallCollider.bounds.max.x;
+	    float maxX = rightWallCollider.bounds.min.x;
+	    float minY = floorCollider.bounds.max.y;
 
-    dashTarget.x = Mathf.Clamp(dashTarget.x, minX, maxX);
-    dashTarget.y = Mathf.Max(dashTarget.y, minY);
+	    dashTarget.x = Mathf.Clamp(dashTarget.x, minX, maxX);
+	    dashTarget.y = Mathf.Max(dashTarget.y, minY);
 
-    float elapsed = 0f;
+	    float elapsed = 0f;
 
-    while (elapsed < dashDuration)
-    {
-        transform.position = Vector2.MoveTowards(transform.position, dashTarget, (dashDistance / dashDuration) * Time.deltaTime);
-	    // Spawn ghost trail here
-	    if (ghostSpawner != null)
-        {
-	        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-	        ghostSpawner.SpawnGhost(transform.position, sr);
-        }
-        // Damage enemies on dash path
-        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.5f, dashDirection, 0.1f,
-            LayerMask.GetMask("Fighters"));
+		float ghostSpawnInterval = dashDuration / 6f;
+		float ghostSpawnTimer = 0f;
+	    
+	    while (elapsed < dashDuration)
+	    {
+		    Vector2 step = dashDirection * (dashDistance/dashDuration) * Time.deltaTime;
+		    rb.MovePosition(rb.position + step);
+		    
+		    // Spawn ghost trail here
+		    ghostSpawnTimer += Time.deltaTime;
+		    if (ghostSpawner != null && ghostSpawnTimer >= ghostSpawnInterval)
+	        {
+		        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+		        ghostSpawner.SpawnGhost(transform.position, sr);
+		        ghostSpawnTimer = 0f; // reset timer.
+	        }
+	        // Damage enemies on dash path
+	        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.5f, dashDirection, 0.1f,
+	            LayerMask.GetMask("Fighters"));
 
-        if (hit.collider != null)
-        {
-            FighterBase opponent = hit.collider.GetComponent<FighterBase>();
-            if (opponent != null && opponent != this)
-            {
-                opponent.TakeDamage(dashDamage, this);
+	        if (hit.collider != null)
+	        {
+	            FighterBase opponent = hit.collider.GetComponent<FighterBase>();
+	            if (opponent != null && opponent != this)
+	            {
+	                opponent.TakeDamage(dashDamage, this);
 
-                Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
-                if (opponentRb != null)
-                {
-                    Vector2 knockbackDirection = new Vector2(dashDirection.x, 0f);
-                    opponentRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
-                }
+	                Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
+	                if (opponentRb != null)
+	                {
+	                    Vector2 knockbackDirection = new Vector2(dashDirection.x, 0f);
+	                    opponentRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+	                }
 
-                StatusEffectManager opponentStatus = opponent.GetComponent<StatusEffectManager>();
-                if (opponentStatus != null)
-                {
-                    opponentStatus.ApplyStun(stunDuration);
-                }
+	                StatusEffectManager opponentStatus = opponent.GetComponent<StatusEffectManager>();
+	                if (opponentStatus != null)
+	                {
+	                    opponentStatus.ApplyStun(stunDuration);
+	                }
 
-                Debug.Log($"{fighterName} performs Dash Pierce on {opponent.fighterName} for {dashDamage} damage!");
-            }
-        }
+	                Debug.Log($"{fighterName} performs Dash Pierce on {opponent.fighterName} for {dashDamage} damage!");
+	            }
+	        }
 
-        // Check for collision with walls/floor to stop dash
-        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, dashDirection, 0.1f, LayerMask.GetMask("Ground"));
+	        // Check for collision with walls/floor to stop dash
+	        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, dashDirection, 0.1f, LayerMask.GetMask("Ground"));
 
-        if (wallHit.collider != null &&
-            (wallHit.collider == leftWallCollider || wallHit.collider == rightWallCollider || wallHit.collider == floorCollider))
-        {
-            Debug.Log("Dash stopped by wall or floor.");
-            break;
-        }
+	        if (wallHit.collider != null &&
+	            (wallHit.collider == leftWallCollider || wallHit.collider == rightWallCollider || wallHit.collider == floorCollider))
+	        {
+	            Debug.Log("Dash stopped by wall or floor.");
+	            break;
+	        }
 
-        elapsed += Time.deltaTime;
-        yield return null;
-    }
+	        elapsed += Time.deltaTime;
+	        yield return null;
+	    }
 
-    // Reset layer and gravity
-    gameObject.layer = LayerMask.NameToLayer("Fighters");
+	    // Reset layer and gravity
+	    gameObject.layer = LayerMask.NameToLayer("Fighters");
 
-    if (rb != null)
-        rb.gravityScale = 1f;
+	    if (rb != null)
+	        rb.gravityScale = 1f;
 
-    isDashing = false;
-    isPerformingAbility = false;
-}
+	    isDashing = false;
+	    isPerformingAbility = false;
+	    
+	    mainCollider.isTrigger = false;
+	    
+	}
 
 	public override void Attack(FighterBase opponent)
 	{
@@ -160,4 +179,32 @@ public class Samurai : FighterBase
 		opponent.TakeDamage(damage, this);
 		Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
 	}
+	
+	private void OnTriggerEnter2D(Collider2D other)
+	{
+		if (!isDashing || hasDashedHit) return;
+
+		if (other.TryGetComponent<FighterBase>(out var opponent) && opponent != this)
+		{
+			hasDashedHit = true;
+			opponent.TakeDamage(dashDamage, this);
+
+			// knockback / stun
+			var rb2 = opponent.GetComponent<Rigidbody2D>();
+			if (rb2 != null) 
+				rb2.AddForce(transform.right * knockbackForce, ForceMode2D.Impulse);
+			opponent.GetComponent<StatusEffectManager>()?.ApplyStun(stunDuration);
+		}
+	}
+
+	private void OnCollisionEnter2D(Collision2D col)
+	{
+		if (!isDashing) return;
+
+		// assumes your walls/floor are on layer “Ground”
+		if (col.gameObject.layer == LayerMask.NameToLayer("Ground"))
+			isDashing = false;
+	}
+
+	
 }
