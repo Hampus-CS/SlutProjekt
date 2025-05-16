@@ -12,7 +12,7 @@ public class Mage : FighterBase
 	void Update()
 	{
 		if (!IsOwner) return;
-		
+
 		if (statusEffectManager.IsStunned()) return;
 
 		if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastFireballTime + fireballCooldown)
@@ -35,11 +35,22 @@ public class Mage : FighterBase
 		}
 	}
 
-	void ShootFireball()
+	private void ShootFireball()
 	{
 		if (fireballPrefab != null && firePoint != null)
 		{
 			GameObject fireball = Instantiate(fireballPrefab, firePoint.position, Quaternion.identity);
+
+			Fireball fireballScript = fireball.GetComponent<Fireball>();
+			if (fireballScript != null)
+			{
+				fireballScript.attacker = this;
+			}
+			else
+			{
+				Debug.LogWarning("Fireball script missing on fireball prefab!");
+			}
+
 			Rigidbody2D rb = fireball.GetComponent<Rigidbody2D>();
 
 			float direction = transform.localScale.x < 0 ? -1f : 1f;

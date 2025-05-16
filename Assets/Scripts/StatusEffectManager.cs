@@ -4,204 +4,202 @@ using System.Collections.Generic;
 public class StatusEffectManager : MonoBehaviour
 {
 	private PlayerMove moveScript;
-    private FighterBase fighter;
-    private List<StatusEffect> activeEffects = new();
+	private FighterBase fighter;
+	private List<StatusEffect> activeEffects = new();
 
-    
-    
-    private void Start()
-    {
-	    fighter = GetComponent<FighterBase>();
-	    moveScript = fighter.GetComponent<PlayerMove>();
-    }
-    
-    private void Update()
-    {
-        for (int i = activeEffects.Count - 1; i >= 0; i--)
-        {
-            activeEffects[i].UpdateEffect(Time.deltaTime);
+	private void Start()
+	{
+		fighter = GetComponent<FighterBase>();
+		moveScript = fighter.GetComponent<PlayerMove>();
+	}
 
-            if (activeEffects[i].IsFinished)
-            {
-                activeEffects[i].End();
-                activeEffects.RemoveAt(i);
-            }
-        }
-    }
+	private void Update()
+	{
+		for (int i = activeEffects.Count - 1; i >= 0; i--)
+		{
+			activeEffects[i].UpdateEffect(Time.deltaTime);
 
-    public void ApplyBurn(int totalBurnDamage, float duration)
-    {
-        BurnEffect burn = new(duration, totalBurnDamage, fighter);
-        activeEffects.Add(burn);
-        burn.Start();
-    }
+			if (activeEffects[i].IsFinished)
+			{
+				activeEffects[i].End();
+				activeEffects.RemoveAt(i);
+			}
+		}
+	}
 
-    public void ApplyStun(float duration)
-    {
-        StunEffect stun = new(duration, fighter);
-        activeEffects.Add(stun);
-        stun.Start();
-    }
+	public void ApplyBurn(int totalBurnDamage, float duration)
+	{
+		BurnEffect burn = new(duration, totalBurnDamage, fighter);
+		activeEffects.Add(burn);
+		burn.Start();
+	}
 
-    public bool IsStunned()
-    {
-        foreach (var effect in activeEffects)
-        {
-            if (effect is StunEffect)
-                return true;
-        }
+	public void ApplyStun(float duration)
+	{
+		StunEffect stun = new(duration, fighter);
+		activeEffects.Add(stun);
+		stun.Start();
+	}
 
-        return false;
-    }
+	public bool IsStunned()
+	{
+		foreach (var effect in activeEffects)
+		{
+			if (effect is StunEffect)
+				return true;
+		}
 
-    private abstract class StatusEffect
-    {
-        protected FighterBase fighter;
-        private float duration;
-        private float elapsed;
+		return false;
+	}
 
-        public bool IsFinished => elapsed >= duration;
+	private abstract class StatusEffect
+	{
+		protected FighterBase fighter;
+		private float duration;
+		private float elapsed;
 
-        protected StatusEffect(float duration, FighterBase fighter)
-        {
-            this.duration = duration;
-            this.fighter = fighter;
-            elapsed = 0f;
-        }
+		public bool IsFinished => elapsed >= duration;
 
-        public abstract void Start();
+		protected StatusEffect(float duration, FighterBase fighter)
+		{
+			this.duration = duration;
+			this.fighter = fighter;
+			elapsed = 0f;
+		}
 
-        public virtual void UpdateEffect(float deltaTime)
-        {
-            elapsed += deltaTime;
-        }
+		public abstract void Start();
 
-        public abstract void End();
-    }
+		public virtual void UpdateEffect(float deltaTime)
+		{
+			elapsed += deltaTime;
+		}
 
-    // Burn Effect
-    private class BurnEffect : StatusEffect
-    {
-        private float totalBurnDamage;
-        private float damagePerSecond;
-        private float damageAccumulated;
+		public abstract void End();
+	}
 
-        private SpriteRenderer spriteRenderer;
-        private Color originalColor;
-        private float pulseSpeed = 4f;
+	// Burn Effect
+	private class BurnEffect : StatusEffect
+	{
+		private float totalBurnDamage;
+		private float damagePerSecond;
+		private float damageAccumulated;
 
-        public BurnEffect(float duration, int totalBurnDamage, FighterBase fighter) : base(duration, fighter)
-        {
-            damagePerSecond = totalBurnDamage / duration;
-            damageAccumulated = 0f;
+		private SpriteRenderer spriteRenderer;
+		private Color originalColor;
+		private float pulseSpeed = 4f;
 
-            spriteRenderer = fighter.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
-            {
-                originalColor = spriteRenderer.color;
-            }
-        }
+		public BurnEffect(float duration, int totalBurnDamage, FighterBase fighter) : base(duration, fighter)
+		{
+			damagePerSecond = totalBurnDamage / duration;
+			damageAccumulated = 0f;
 
-        public override void Start()
-        {
-            spriteRenderer = fighter.SpriteRenderer;
+			spriteRenderer = fighter.GetComponent<SpriteRenderer>();
+			if (spriteRenderer != null)
+			{
+				originalColor = spriteRenderer.color;
+			}
+		}
 
-            if (spriteRenderer != null)
-            {
-                originalColor = spriteRenderer.color;
-            }
+		public override void Start()
+		{
+			spriteRenderer = fighter.SpriteRenderer;
 
-            Debug.Log($"{fighter.fighterName} starts burning!");
-        }
+			if (spriteRenderer != null)
+			{
+				originalColor = spriteRenderer.color;
+			}
 
-        public override void UpdateEffect(float deltaTime)
-        {
-            base.UpdateEffect(deltaTime);
-            damageAccumulated += damagePerSecond * deltaTime;
+			Debug.Log($"{fighter.fighterName} starts burning!");
+		}
 
-            if (damageAccumulated >= 1f)
-            {
-                int damageToApply = Mathf.FloorToInt(damageAccumulated);
-                fighter.TakeDamage(damageToApply, fighter);
-                damageAccumulated -= damageToApply;
-                Debug.Log($"{fighter.fighterName} takes {damageToApply} burn damage!");
-            }
+		public override void UpdateEffect(float deltaTime)
+		{
+			base.UpdateEffect(deltaTime);
+			damageAccumulated += damagePerSecond * deltaTime;
 
-            if (spriteRenderer != null)
-            {
-                float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
-                Color burnColor = new Color(1f, 0f, 0f, 0.5f * pulse);
-                spriteRenderer.color = Color.Lerp(originalColor, burnColor, pulse);
-            }
-        }
+			if (damageAccumulated >= 1f)
+			{
+				int damageToApply = Mathf.FloorToInt(damageAccumulated);
+				fighter.TakeDamage(damageToApply, fighter);
+				damageAccumulated -= damageToApply;
+				Debug.Log($"{fighter.fighterName} takes {damageToApply} burn damage!");
+			}
 
-        public override void End()
-        {
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = originalColor;
-            }
+			if (spriteRenderer != null)
+			{
+				float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
+				Color burnColor = new Color(1f, 0f, 0f, 0.7f * pulse);
+				spriteRenderer.color = Color.Lerp(originalColor, burnColor, pulse);
+			}
+		}
 
-            Debug.Log($"{fighter.fighterName} burn effect ended.");
-        }
-    }
+		public override void End()
+		{
+			if (spriteRenderer != null)
+			{
+				spriteRenderer.color = originalColor;
+			}
 
-    // Stun Effect
-    private class StunEffect : StatusEffect
-    {
-        private PlayerMove moveScript;
-        private SpriteRenderer spriteRenderer;
-        private Color originalColor;
-        private Color stunColor = new(0.6f, 0.8f, 1f, 1f);
+			Debug.Log($"{fighter.fighterName} burn effect ended.");
+		}
+	}
 
-        public StunEffect(float duration, FighterBase fighter) : base(duration, fighter)
-        {
-            moveScript = fighter.GetComponent<PlayerMove>();
-            spriteRenderer = fighter.GetComponent<SpriteRenderer>();
+	// Stun Effect
+	private class StunEffect : StatusEffect
+	{
+		private PlayerMove moveScript;
+		private SpriteRenderer spriteRenderer;
+		private Color originalColor;
+		private Color stunColor = new(0.6f, 0.8f, 1f, 1f);
 
-            if (spriteRenderer != null)
-            {
-                originalColor = spriteRenderer.color;
-            }
-        }
+		public StunEffect(float duration, FighterBase fighter) : base(duration, fighter)
+		{
+			moveScript = fighter.GetComponent<PlayerMove>();
+			spriteRenderer = fighter.GetComponent<SpriteRenderer>();
 
-        public override void Start()
-        {
-            moveScript = fighter.PlayerMove;
-            spriteRenderer = fighter.SpriteRenderer;
+			if (spriteRenderer != null)
+			{
+				originalColor = spriteRenderer.color;
+			}
+		}
 
-            if (moveScript != null)
-            {
-                moveScript.BlockMovement(true);
-            }
+		public override void Start()
+		{
+			moveScript = fighter.PlayerMove;
+			spriteRenderer = fighter.SpriteRenderer;
 
-            if (spriteRenderer != null)
-            {
-                originalColor = spriteRenderer.color;
-                spriteRenderer.color = stunColor;
-            }
+			if (moveScript != null)
+			{
+				moveScript.BlockMovement(true);
+			}
 
-            Debug.Log($"{fighter.fighterName} is stunned!");
-        }
+			if (spriteRenderer != null)
+			{
+				originalColor = spriteRenderer.color;
+				spriteRenderer.color = stunColor;
+			}
 
-        public override void UpdateEffect(float deltaTime)
-        {
-            base.UpdateEffect(deltaTime);
-        }
+			Debug.Log($"{fighter.fighterName} is stunned!");
+		}
 
-        public override void End()
-        {
-            if (moveScript != null)
-            {
-                moveScript.BlockMovement(false);
-            }
+		public override void UpdateEffect(float deltaTime)
+		{
+			base.UpdateEffect(deltaTime);
+		}
 
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = originalColor;
-            }
+		public override void End()
+		{
+			if (moveScript != null)
+			{
+				moveScript.BlockMovement(false);
+			}
 
-            Debug.Log($"{fighter.fighterName} stun effect ended.");
-        }
-    }
+			if (spriteRenderer != null)
+			{
+				spriteRenderer.color = originalColor;
+			}
+
+			Debug.Log($"{fighter.fighterName} stun effect ended.");
+		}
+	}
 }
