@@ -20,9 +20,13 @@ public class Samurai : FighterBase
 	private Vector2 dashTarget;
 
 	private Rigidbody2D rb;
+	
+	public GameObject ghostPrefab;
+	private GhostSpawner ghostSpawner;
 
 	private void Start()
 	{
+		ghostSpawner = GetComponent<GhostSpawner>();
 		rb = GetComponent<Rigidbody2D>();
 		animator = GetComponent<Animator>();
 		
@@ -83,9 +87,13 @@ public class Samurai : FighterBase
 
     while (elapsed < dashDuration)
     {
-        transform.position = Vector2.MoveTowards(transform.position, dashTarget,
-            (dashDistance / dashDuration) * Time.deltaTime);
-
+        transform.position = Vector2.MoveTowards(transform.position, dashTarget, (dashDistance / dashDuration) * Time.deltaTime);
+	    // Spawn ghost trail here
+	    if (ghostSpawner != null)
+        {
+	        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+	        ghostSpawner.SpawnGhost(transform.position, sr);
+        }
         // Damage enemies on dash path
         RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.5f, dashDirection, 0.1f,
             LayerMask.GetMask("Fighters"));
