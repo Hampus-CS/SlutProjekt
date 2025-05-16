@@ -4,18 +4,20 @@ using UnityEngine;
 
 public class Samurai : FighterBase
 {
-	[Header("Dash Pierce Settings")] public float dashDistance = 5f;
-	public float dashDuration = 0.3f;
-	public int dashDamage = 10;
-	public float knockbackForce = 10f;
-	public float stunDuration = 1f;
-	public float lastDashTime;
+	[Header("Dash Pierce Settings")] 
+	private float dashDistance = 10f;
+	private float dashDuration = 0.3f;
+	private float knockbackForce = 10f;
+	private float stunDuration = 0.5f;
+	private float lastDashTime;
+	private int dashDamage = 10;
 	private bool isDashing = false;
 	private bool isPerformingAbility = false;
 	private bool hasDashedHit;
-
-	private Collider2D mainCollider;
 	
+
+	[Header("Colliders")]
+	private Collider2D mainCollider;
 	private BoxCollider2D leftWallCollider;
 	private BoxCollider2D rightWallCollider;
 	private BoxCollider2D floorCollider;
@@ -24,8 +26,12 @@ public class Samurai : FighterBase
 
 	private Rigidbody2D rb;
 	
+	[Header("Ghost afterImage")]
 	public GameObject ghostPrefab;
 	private GhostSpawner ghostSpawner;
+	private float ghostSpawnInterval;
+	private float ghostSpawnTimer = 0f;
+	private float numberOfGhost = 10f;
 	
 	private void Start()
 	{
@@ -34,7 +40,7 @@ public class Samurai : FighterBase
 		rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 		animator = GetComponent<Animator>();
 		
-		// Auto-assign colliders from scene
+		// Assign colliders
 		leftWallCollider = GameObject.Find("LeftWall")?.GetComponent<BoxCollider2D>();
 		rightWallCollider = GameObject.Find("RightWall")?.GetComponent<BoxCollider2D>();
 		floorCollider = GameObject.Find("Floor")?.GetComponent<BoxCollider2D>();
@@ -73,7 +79,7 @@ public class Samurai : FighterBase
 	    lastDashTime = Time.time;
 
 	    if (animator != null)
-	        animator.SetTrigger("Ability");
+	        animator.SetTrigger("AbilityTrigger");
 
 	    // Change layer so player can pass through enemies
 	    gameObject.layer = LayerMask.NameToLayer("NoCollision");
@@ -94,25 +100,24 @@ public class Samurai : FighterBase
 
 	    float elapsed = 0f;
 
-		float ghostSpawnInterval = dashDuration / 6f;
-		float ghostSpawnTimer = 0f;
+		ghostSpawnInterval = dashDuration / numberOfGhost;
 	    
 	    while (elapsed < dashDuration)
 	    {
 		    Vector2 step = dashDirection * (dashDistance/dashDuration) * Time.deltaTime;
 		    rb.MovePosition(rb.position + step);
 		    
-		    // Spawn ghost trail here
+		    // Spawn ghost trail
 		    ghostSpawnTimer += Time.deltaTime;
 		    if (ghostSpawner != null && ghostSpawnTimer >= ghostSpawnInterval)
 	        {
 		        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-		        ghostSpawner.SpawnGhost(transform.position, sr);
-		        ghostSpawnTimer = 0f; // reset timer.
+		        ghostSpawner.SpawnGhost(transform.position, sr, transform.localScale);
+		        ghostSpawnTimer = 0f;
 	        }
+		    
 	        // Damage enemies on dash path
-	        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.5f, dashDirection, 0.1f,
-	            LayerMask.GetMask("Fighters"));
+	        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.5f, dashDirection, 0.1f, LayerMask.GetMask("Fighters"));
 
 	        if (hit.collider != null)
 	        {
@@ -138,13 +143,13 @@ public class Samurai : FighterBase
 	            }
 	        }
 
-	        // Check for collision with walls/floor to stop dash
+	        // Check for collision with walls to stop dash
 	        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, dashDirection, 0.1f, LayerMask.GetMask("Ground"));
 
 	        if (wallHit.collider != null &&
 	            (wallHit.collider == leftWallCollider || wallHit.collider == rightWallCollider || wallHit.collider == floorCollider))
 	        {
-	            Debug.Log("Dash stopped by wall or floor.");
+	            Debug.Log("Dash stopped by wall.");
 	            break;
 	        }
 
@@ -189,7 +194,7 @@ public class Samurai : FighterBase
 			hasDashedHit = true;
 			opponent.TakeDamage(dashDamage, this);
 
-			// knockback / stun
+			// knockback, stun
 			var rb2 = opponent.GetComponent<Rigidbody2D>();
 			if (rb2 != null) 
 				rb2.AddForce(transform.right * knockbackForce, ForceMode2D.Impulse);
@@ -201,10 +206,7 @@ public class Samurai : FighterBase
 	{
 		if (!isDashing) return;
 
-		// assumes your walls/floor are on layer “Ground”
 		if (col.gameObject.layer == LayerMask.NameToLayer("Ground"))
 			isDashing = false;
 	}
-
-	
 }

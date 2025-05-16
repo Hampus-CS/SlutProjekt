@@ -90,7 +90,7 @@ public abstract class FighterBase : NetworkBehaviour
         UpdateManaSlider();
     }
 
-    public virtual void TakeDamage(int amount, FighterBase attacker)
+    public void TakeDamage(int amount, FighterBase attacker)
     {
         PlayDamageAnimation();
         currentHealth -= amount;
@@ -113,7 +113,6 @@ public abstract class FighterBase : NetworkBehaviour
             UpdateHealthSlider();
             sliderUI.FlashHealthOnDamage();
         }
-        
     }
 
     public abstract void Attack(FighterBase opponent);
@@ -208,7 +207,6 @@ public abstract class FighterBase : NetworkBehaviour
 	        // Client dying → asks the host to relay that RPC
 	        SubmitOpponentWonServerRpc();
         }
-        
     }
     
     private void UpdateHealthSlider()

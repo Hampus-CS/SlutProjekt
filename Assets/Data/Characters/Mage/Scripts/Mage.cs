@@ -42,20 +42,11 @@ public class Mage : FighterBase
 			GameObject fireball = Instantiate(fireballPrefab, firePoint.position, Quaternion.identity);
 			Rigidbody2D rb = fireball.GetComponent<Rigidbody2D>();
 
-			float direction = transform.localScale.x < 0 ? 1f : -1f;
+			float direction = transform.localScale.x < 0 ? -1f : 1f;
 			rb.linearVelocity = new Vector2(direction * fireballSpeed, 0f);
 
 			Vector3 scale = fireball.transform.localScale;
-
-			if (direction < 0)
-			{
-				scale.x = -Mathf.Abs(scale.x);
-			}
-			else
-			{
-				scale.x = Mathf.Abs(scale.x);
-			}
-
+			scale.x = Mathf.Abs(scale.x) * direction;
 			fireball.transform.localScale = scale;
 		}
 	}
