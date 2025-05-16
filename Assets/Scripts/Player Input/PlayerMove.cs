@@ -33,7 +33,22 @@ public class PlayerMove : NetworkBehaviour
     private SpriteRenderer spriteRenderer;
 
     private Animator animator;
+    
+    private NetworkVariable<bool> isFacingRight = new NetworkVariable<bool>(true,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
 
+    public override void OnNetworkSpawn()
+    {
+	    isFacingRight.OnValueChanged += OnFacingChanged;
+	    OnFacingChanged(!isFacingRight.Value, isFacingRight.Value);
+    }
+
+    private void OnFacingChanged(bool oldValue, bool newValue)
+    {
+	    Vector3 scale = transform.localScale;
+	    scale.x = Mathf.Abs(scale.x) * (newValue ? 1 : -1);
+	    transform.localScale = scale;
+    }
+    
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -52,8 +67,20 @@ public class PlayerMove : NetworkBehaviour
         bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
         
         //  Update animation for movement
-        animator.SetBool("isMoving", moveDirection != Vector2.zero && isGrounded);
+        bool isMoving = moveDirection != Vector2.zero;
+        animator.SetBool("isMoving", isMoving);
 
+        if (isMoving)
+        {
+	        bool faceRight = moveDirection.x > 0;
+	        if (isFacingRight.Value != faceRight)
+	        {
+		        isFacingRight.Value = faceRight;
+	        }
+	        
+        }
+        
+        
         if (movingLeft)
         {
             moveDirection = Vector2.left;

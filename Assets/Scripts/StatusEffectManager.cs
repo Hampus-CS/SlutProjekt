@@ -3,9 +3,18 @@ using System.Collections.Generic;
 
 public class StatusEffectManager : MonoBehaviour
 {
+	private PlayerMove moveScript;
     private FighterBase fighter;
     private List<StatusEffect> activeEffects = new();
 
+    
+    
+    private void Start()
+    {
+	    fighter = GetComponent<FighterBase>();
+	    moveScript = fighter.GetComponent<PlayerMove>();
+    }
+    
     private void Update()
     {
         for (int i = activeEffects.Count - 1; i >= 0; i--)

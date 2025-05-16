@@ -42,6 +42,7 @@ public class Wizard : FighterBase
     {
         if (animator != null)
         {
+	        if (!IsOwner) return;
             animator.SetTrigger("AbilityTrigger");
         }
 

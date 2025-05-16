@@ -119,7 +119,7 @@ public abstract class FighterBase : NetworkBehaviour
     public abstract void Attack(FighterBase opponent);
 
     // Ranged characters default attack
-    protected virtual void ProjectileAttack()
+    protected void ProjectileAttack()
     {
         if (Time.time < lastProjectileTime + projectileCooldown)
         {
@@ -136,7 +136,7 @@ public abstract class FighterBase : NetworkBehaviour
 
             if (rb != null)
             {
-                float direction = transform.localScale.x < 0 ? -1f : 1f;
+                float direction = transform.localScale.x < 0 ? 1f : -1f;
                 rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
             }
 
@@ -177,7 +177,7 @@ public abstract class FighterBase : NetworkBehaviour
         PlayAttackAnimation();
     }
 
-    protected virtual void Die()
+    private void Die()
     {
         Debug.Log($"{fighterName} has died.");
         
@@ -185,35 +185,28 @@ public abstract class FighterBase : NetworkBehaviour
         {
 	        animator.SetBool("isDead", true);
 	        PlayDeathAnimation();
+	        statusEffectManager.IsStunned();
         }
 
-        if (IsOwner)
-        {
-	        bool won = false;
-	        int kills = sessionKills;
-	        int deaths = sessionDeaths + 1;
+        if (!IsOwner)
+	        return;  // Only the local player’s object runs the below
 
-	        if (IsServer)
-	        {
-		        // Host dying: finalize directly
-		        var gm = FindObjectOfType<GameManager>();
-		        if (gm != null)
-		        {
-			        gm.FinalizeMatch(won, kills, deaths);
-			        Debug.Log("[FighterBase] FinalizeMatch called on HOST.");
-		        }
-	        }
-	        else
-	        {
-		        // Client dying: ask host to finalize via RPC
-		        SubmitMatchResultServerRpc(won, kills, deaths);
-	        }
-        }
-        
-        if (!IsServer && IsOwner)
+        // 1) Record “I died” on my profile
+        bool iWon     = false;
+        int myKills   = sessionKills;
+        int myDeaths  = sessionDeaths + 1;
+        FinalizeLocalMatch(iWon, myKills, myDeaths);
+
+        // 2) Tell the opponent to record “I won” on THEIR profile
+        if (IsServer)
         {
-	        // Let client object auto-clean up after scene transition
-	        NetworkObject.Despawn(true); // true = destroy after despawn
+	        // Host dying → directly send ClientRpc to the other client(s)
+	        NotifyOpponentWonClientRpc();
+        }
+        else
+        {
+	        // Client dying → asks the host to relay that RPC
+	        SubmitOpponentWonServerRpc();
         }
         
     }
@@ -283,11 +276,13 @@ public abstract class FighterBase : NetworkBehaviour
     // Animations
     protected void PlayAttackAnimation()
     {
+	    if (!IsOwner) return;
         animator.SetTrigger("AttackTrigger");
     }
 
     private void PlayDamageAnimation()
     {
+	    if (!IsOwner) return;
         animator.SetTrigger("DamageTrigger");
     }
 
@@ -333,6 +328,38 @@ public abstract class FighterBase : NetworkBehaviour
 		    Debug.Log("[FighterBase] FinalizeMatch triggered via ServerRpc from client.");
 	    }
     }
+    /// <summary>
+    /// Locally calls GameManager.FinalizeMatch and saves to disk.
+    /// </summary>
+    private void FinalizeLocalMatch(bool won, int kills, int deaths)
+    {
+	    var gm = FindObjectOfType<GameManager>();
+	    if (gm != null)
+		    gm.FinalizeMatch(won, kills, deaths);
+    }
 
+    /// <summary>
+    /// Client→Server: dying client asks host to notify the opponent(s).
+    /// </summary>
+    [ServerRpc]
+    private void SubmitOpponentWonServerRpc(ServerRpcParams rpcParams = default)
+    {
+	    NotifyOpponentWonClientRpc();
+    }
+
+    /// <summary>
+    /// Server→Clients: instruct surviving clients to record a win.
+    /// </summary>
+    [ClientRpc]
+    private void NotifyOpponentWonClientRpc(ClientRpcParams rpcParams = default)
+    {
+	    // Only the surviving player’s owner should run this
+	    if (!IsOwner) return;
+
+	    bool iWon     = true;
+	    int myKills   = sessionKills;
+	    int myDeaths  = sessionDeaths;
+	    FinalizeLocalMatch(iWon, myKills, myDeaths);
+    }
     
 }

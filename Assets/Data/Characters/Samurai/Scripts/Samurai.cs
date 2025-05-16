@@ -1,138 +1,155 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class Samurai : FighterBase
 {
-    [Header("Dash Pierce Settings")]
-    public float dashDistance = 5f;
-    public float dashSpeed = 10f;
-    public float dashCooldown = 5f;
-    public float knockbackForce = 5f;
-    public float stunDuration = 0.5f;
-    public int dashDamage = 15;
+	[Header("Dash Pierce Settings")] public float dashDistance = 5f;
+	public float dashDuration = 0.3f;
+	public int dashDamage = 10;
+	public float knockbackForce = 10f;
+	public float stunDuration = 1f;
+	public float lastDashTime;
+	private bool isDashing = false;
+	private bool isPerformingAbility = false;
 
-    private float lastDashTime = -Mathf.Infinity;
-    private bool isDashing;
-    private bool isPerformingAbility;
-    private Vector3 dashTarget;
+	private BoxCollider2D leftWallCollider;
+	private BoxCollider2D rightWallCollider;
+	private BoxCollider2D floorCollider;
+	
+	private Vector2 dashTarget;
 
-    private void Update()
+	private Rigidbody2D rb;
+
+	private void Start()
+	{
+		rb = GetComponent<Rigidbody2D>();
+		animator = GetComponent<Animator>();
+		
+		// Auto-assign colliders from scene
+		leftWallCollider = GameObject.Find("LeftWall")?.GetComponent<BoxCollider2D>();
+		rightWallCollider = GameObject.Find("RightWall")?.GetComponent<BoxCollider2D>();
+		floorCollider = GameObject.Find("Floor")?.GetComponent<BoxCollider2D>();
+
+		if (leftWallCollider == null || rightWallCollider == null || floorCollider == null)
+		{
+			Debug.LogError("One or more wall/floor colliders are missing!");
+		}
+	}
+
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Space) && !isPerformingAbility && Time.time - lastDashTime > dashDuration)
+		{
+			StartDashPierce();
+		}
+	}
+
+	private void StartDashPierce()
+	{
+		if (!isDashing)
+		{
+			StartCoroutine(DashCoroutine());
+		}
+	}
+
+	private IEnumerator DashCoroutine()
+{
+    isDashing = true;
+    isPerformingAbility = true;
+    lastDashTime = Time.time;
+
+    if (animator != null)
+        animator.SetTrigger("Ability");
+
+    // Change layer so player can pass through enemies
+    gameObject.layer = LayerMask.NameToLayer("NoCollision");
+
+    if (rb != null)
+        rb.gravityScale = 0f;
+
+    Vector2 dashDirection = transform.localScale.x < 0 ? Vector2.left : Vector2.right;
+    dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
+
+    // Clamp dashTarget inside arena bounds
+    float minX = leftWallCollider.bounds.max.x;
+    float maxX = rightWallCollider.bounds.min.x;
+    float minY = floorCollider.bounds.max.y;
+
+    dashTarget.x = Mathf.Clamp(dashTarget.x, minX, maxX);
+    dashTarget.y = Mathf.Max(dashTarget.y, minY);
+
+    float elapsed = 0f;
+
+    while (elapsed < dashDuration)
     {
-	    if (!IsOwner) return;
-	    
-	    if (statusEffectManager.IsStunned() || isPerformingAbility) return;
+        transform.position = Vector2.MoveTowards(transform.position, dashTarget,
+            (dashDistance / dashDuration) * Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastDashTime + dashCooldown && !isDashing &&
-            !isPerformingAbility)
-        {
-            StartDashPierce();
-        }
-
-        if (isDashing)
-        {
-            float step = dashSpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, dashTarget, step);
-
-            if (Vector3.Distance(transform.position, dashTarget) < 0.1f)
-            {
-                isDashing = false;
-            }
-        }
-        
-        if (Input.GetMouseButtonDown(0))
-        {
-            Attack(null);   
-        }
-    }
-
-    private void StartDashPierce()
-    {
-        isDashing = true;
-        isPerformingAbility = true;
-        lastDashTime = Time.time;
-
-        // Trigger animation
-        if (animator != null)
-        {
-            animator.SetTrigger("Ability");
-        }
-
-        // Determine dash direction based on the character's facing direction
-        Vector2 dashDirection = transform.localScale.x < 0 ? Vector2.left : Vector2.right;
-
-        // Set the default dash target to be the max distance, using Vector2 for 2D space
-        dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
-
-        // Perform a Raycast to check for obstacles and enemies
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dashDirection, dashDistance, LayerMask.GetMask("Ground", "Fighters"));
+        // Damage enemies on dash path
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, 0.5f, dashDirection, 0.1f,
+            LayerMask.GetMask("Fighters"));
 
         if (hit.collider != null)
         {
-            // Check if we hit an enemy
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Fighters"))
+            FighterBase opponent = hit.collider.GetComponent<FighterBase>();
+            if (opponent != null && opponent != this)
             {
-                FighterBase opponent = hit.collider.GetComponent<FighterBase>();
-                if (opponent != null && opponent != this)
+                opponent.TakeDamage(dashDamage, this);
+
+                Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
+                if (opponentRb != null)
                 {
-                    // Apply damage, knockback, and stun to the opponent
-                    opponent.TakeDamage(dashDamage, this);
-
-                    Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
-                    if (opponentRb != null)
-                    {
-                        Vector2 knockbackDirection = new Vector2(dashDirection.x, 0f);
-                        opponentRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
-                    }
-
-                    StatusEffectManager opponentStatus = opponent.GetComponent<StatusEffectManager>();
-                    if (opponentStatus != null)
-                    {
-                        opponentStatus.ApplyStun(stunDuration);
-                    }
-
-                    Debug.Log($"{fighterName} performs Dash Pierce on {opponent.fighterName} for {dashDamage} damage!");
+                    Vector2 knockbackDirection = new Vector2(dashDirection.x, 0f);
+                    opponentRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
                 }
 
-                // If there's still remaining distance after hitting the enemy, continue the dash
-                float distanceToTravelAfterEnemy = dashDistance - hit.distance;
-                if (distanceToTravelAfterEnemy > 0)
+                StatusEffectManager opponentStatus = opponent.GetComponent<StatusEffectManager>();
+                if (opponentStatus != null)
                 {
-                    dashTarget = hit.point + dashDirection * distanceToTravelAfterEnemy;
+                    opponentStatus.ApplyStun(stunDuration);
                 }
-            }
-            // If we hit the ground, stop the dash at the hit point
-            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
-            {
-                dashTarget = hit.point;
+
+                Debug.Log($"{fighterName} performs Dash Pierce on {opponent.fighterName} for {dashDamage} damage!");
             }
         }
 
-        // Ensure that dashTarget doesn't exceed the max dash distance
-        float remainingDistance = Vector2.Distance(transform.position, dashTarget);
-        if (remainingDistance > dashDistance)
+        // Check for collision with walls/floor to stop dash
+        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, dashDirection, 0.1f, LayerMask.GetMask("Ground"));
+
+        if (wallHit.collider != null &&
+            (wallHit.collider == leftWallCollider || wallHit.collider == rightWallCollider || wallHit.collider == floorCollider))
         {
-            dashTarget = (Vector2)transform.position + dashDirection * dashDistance;
+            Debug.Log("Dash stopped by wall or floor.");
+            break;
         }
 
-        OnAbilityAnimationEnd();
+        elapsed += Time.deltaTime;
+        yield return null;
     }
 
-    private void OnAbilityAnimationEnd()
-    {
-        isPerformingAbility = false;
-        Debug.Log("Ability animation finished.");
-    }
+    // Reset layer and gravity
+    gameObject.layer = LayerMask.NameToLayer("Fighters");
 
-    public override void Attack(FighterBase opponent)
-    {
-        if (statusEffectManager != null && statusEffectManager.IsStunned())
-        {
-            Debug.Log($"{fighterName} is stunned and cannot attack!");
-            return;
-        }
+    if (rb != null)
+        rb.gravityScale = 1f;
 
-        MeleeAttack();
-        PlayAttackAnimation();
+    isDashing = false;
+    isPerformingAbility = false;
+}
 
-        Debug.Log($"{fighterName} attacks {opponent.fighterName}");
-    }
+	public override void Attack(FighterBase opponent)
+	{
+		if (statusEffectManager != null && statusEffectManager.IsStunned())
+		{
+			Debug.Log($"{fighterName} is stunned and cannot attack!");
+			return;
+		}
+
+		int damage = baseAttackPower + 5;
+		PlayAttackAnimation();
+		MeleeAttack();
+		opponent.TakeDamage(damage, this);
+		Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
+	}
 }
