@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Wizard
   m_EditorClassIdentifier: 
   id: 3
-  displayName: Raizel, The Storm Sage
-  title: 
+  displayName: Raizel
+  title: The Storm Sage
   idleSprite: {fileID: 4723107735738678597, guid: 0aecbd3fe0ad14542990cdebcc57f2cf, type: 3}
   basicAttackSprite: {fileID: 6934013284892070054, guid: 62244c0f0e3ed4f4696cc63b1ede0915, type: 3}
   abilitySprite: {fileID: 1817195990524489003, guid: bb788b95a0b598843a413173b20a30ba, type: 3}

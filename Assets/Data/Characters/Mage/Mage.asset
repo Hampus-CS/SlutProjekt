@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Mage
   m_EditorClassIdentifier: 
   id: 1
-  displayName: Sylvara, Flame Seer
-  title: 
+  displayName: Sylvara
+  title: '"Flame Seer"'
   idleSprite: {fileID: 4723107735738678597, guid: a141fb363b48ba04e9111478ce2d5cc0, type: 3}
   basicAttackSprite: {fileID: -7008412969330441016, guid: 11efd2944d96c1f4885f89e46fb894cd, type: 3}
   abilitySprite: {fileID: -910092549403018386, guid: 11efd2944d96c1f4885f89e46fb894cd, type: 3}
