@@ -23,8 +23,8 @@ public class CharacterDetailDisplay : MonoBehaviour
     {
         currentData = data;
 
-        //nameText.text  = data.displayName;
-        //titleText.text = data.title;
+        nameText.text  = data.displayName;
+        titleText.text = data.title;
 
         detailCarousel.Initialize(
             data.idleSprite,

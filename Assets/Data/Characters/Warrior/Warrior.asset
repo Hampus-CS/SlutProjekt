@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Warrior
   m_EditorClassIdentifier: 
   id: 0
-  displayName: Garok, The Iron Guardian
-  title: 
+  displayName: Garok
+  title: The Iron Guardian
   idleSprite: {fileID: 4723107735738678597, guid: 132f4daf730951446901a088507d394b, type: 3}
   basicAttackSprite: {fileID: 6934013284892070054, guid: 03f4052699156eb429aaa65d26a1f15e, type: 3}
   abilitySprite: {fileID: 7441861488978599509, guid: 2489416ea4859aa4c94631e69f00da0f, type: 3}
