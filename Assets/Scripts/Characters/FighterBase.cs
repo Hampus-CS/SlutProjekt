@@ -62,7 +62,8 @@ public abstract class FighterBase : NetworkBehaviour
 			manaSlider = HUDManager.Instance.ManaSlider;
 		}
 
-		sliderUI = FindFirstObjectByType<Sliders>();
+		if (IsOwner)
+			sliderUI = FindFirstObjectByType<Sliders>();
 		animator = GetComponent<Animator>();
 		statusEffectManager = GetComponent<StatusEffectManager>();
 
@@ -93,7 +94,8 @@ public abstract class FighterBase : NetworkBehaviour
 	private void FixedUpdate()
 	{
 		RegenerateMana();
-		UpdateManaSlider();
+		if (IsOwner)
+			UpdateManaSlider();
 	}
 
 	public void TakeDamage(int amount, FighterBase attacker)
@@ -115,7 +117,7 @@ public abstract class FighterBase : NetworkBehaviour
 			Die();
 		}
 
-		if (sliderUI != null)
+		if (IsOwner && sliderUI != null)
 		{
 			UpdateHealthSlider();
 			sliderUI.FlashHealthOnDamage();
@@ -233,28 +235,30 @@ public abstract class FighterBase : NetworkBehaviour
 
 	private void UpdateHealthSlider()
 	{
-		if (healthSlider != null)
+		if (!IsOwner || healthSlider == null)
+			return;
+		
+		if(healthSlider != null)
 		{
 			healthSlider.maxValue = maxHealth;
 			healthSlider.value = currentHealth;
 		}
 		else
-		{
-			Debug.LogWarning("hpSlider is not assigned on " + gameObject.name);
-		}
+			Debug.LogWarning("hpSlider is not assigned on " + gameObject.name);	
 	}
 
 	private void UpdateManaSlider()
 	{
+		if (!IsOwner || manaSlider == null)
+			return;
+		
 		if (manaSlider != null)
 		{
 			manaSlider.maxValue = maxMana;
 			manaSlider.value = currentMana;
 		}
 		else
-		{
 			Debug.LogWarning("manaSlider is not assigned on " + gameObject.name);
-		}
 	}
 
 	private void RegenerateMana()
