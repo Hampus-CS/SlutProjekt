@@ -198,11 +198,9 @@ public abstract class FighterBase : NetworkBehaviour
 				{
 					var net = GetComponent<NetworkObject>();
 				}
-<<<<<<< Updated upstream
-=======
-
+				
 				DealDamageServerRpc(enemyFighter.NetworkObject, this.NetworkObject, meleeDamage);
->>>>>>> Stashed changes
+
 			}
 		}
 
