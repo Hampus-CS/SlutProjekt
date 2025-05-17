@@ -324,7 +324,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   fighterName: Fighter
   baseAttackPower: 10
-  currentHealth: 0
+  currentHealth: 100
   maxHealth: 100
   healthSlider: {fileID: 0}
   manaSlider: {fileID: 0}

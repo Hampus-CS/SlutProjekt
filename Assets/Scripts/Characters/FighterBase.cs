@@ -210,19 +210,25 @@ public abstract class FighterBase : NetworkBehaviour
 		bool iWon = false;
 		int myKills = sessionKills;
 		int myDeaths = sessionDeaths + 1;
+		
+		Debug.Log("Die() has been called and now will attempt to FinalizeLocalMatch()");
+		
 		FinalizeLocalMatch(iWon, myKills, myDeaths);
 
 		// 2) Tell the opponent to record “I won” on THEIR profile
 		if (IsServer)
 		{
+			Debug.Log("Die() tries to call NotifyOpponentWonClientRpc();");
 			// Host dying → directly send ClientRpc to the other client(s)
 			NotifyOpponentWonClientRpc();
 		}
 		else
 		{
+			Debug.Log("Die() tries to call SubmitOpponentWonServerRpc();");
 			// Client dying → asks the host to relay that RPC
 			SubmitOpponentWonServerRpc();
 		}
+		
 	}
 
 	private void UpdateHealthSlider()
@@ -326,29 +332,15 @@ public abstract class FighterBase : NetworkBehaviour
 		}
 	}
 
-	private IEnumerator ReturnToMenuAfterDelay(float delay)
-	{
-		yield return new WaitForSeconds(delay);
-		NetworkManager.Singleton.SceneManager.LoadScene("StartMenu", LoadSceneMode.Single);
-	}
-
-	[ServerRpc]
-	private void SubmitMatchResultServerRpc(bool won, int kills, int deaths)
-	{
-		var gm = FindObjectOfType<GameManager>();
-		if (gm != null)
-		{
-			gm.FinalizeMatch(won, kills, deaths);
-			Debug.Log("[FighterBase] FinalizeMatch triggered via ServerRpc from client.");
-		}
-	}
-
 	/// <summary>
 	/// Locally calls GameManager.FinalizeMatch and saves to disk.
 	/// </summary>
 	private void FinalizeLocalMatch(bool won, int kills, int deaths)
 	{
+		Debug.Log("FinalizeLocalMatch in FighterBase is triggerd");
 		var gm = FindObjectOfType<GameManager>();
+		if (gm == null)
+			Debug.Log("gm is null");
 		if (gm != null)
 			gm.FinalizeMatch(won, kills, deaths);
 	}
@@ -359,6 +351,7 @@ public abstract class FighterBase : NetworkBehaviour
 	[ServerRpc]
 	private void SubmitOpponentWonServerRpc(ServerRpcParams rpcParams = default)
 	{
+		Debug.Log("SubmitOpponentWonServerRpc has been called, will now call NotifyOpponentWonClientRpc()");
 		NotifyOpponentWonClientRpc();
 	}
 
@@ -368,12 +361,33 @@ public abstract class FighterBase : NetworkBehaviour
 	[ClientRpc]
 	private void NotifyOpponentWonClientRpc(ClientRpcParams rpcParams = default)
 	{
+		Debug.Log("NotifyOpponentWonClientRpc has been called, will now call FinalizeLocalMatch()");
+		
 		// Only the surviving player’s owner should run this
-		if (!IsOwner) return;
+		if (IsOwner) return;
 
 		bool iWon = true;
 		int myKills = sessionKills;
 		int myDeaths = sessionDeaths;
 		FinalizeLocalMatch(iWon, myKills, myDeaths);
 	}
+	
+	public override void OnNetworkSpawn()
+	{
+		base.OnNetworkSpawn();
+		if (IsOwner) StartCoroutine(BindHudSlidersWhenReady());
+	}
+
+	private IEnumerator BindHudSlidersWhenReady()
+	{
+		// Wait until HUDManager exists & exposes sliders
+		yield return new WaitUntil(() => HUDManager.Instance && HUDManager.Instance.HealthSlider && HUDManager.Instance.ManaSlider);
+
+		healthSlider = HUDManager.Instance.HealthSlider;
+		manaSlider   = HUDManager.Instance.ManaSlider;
+
+		UpdateHealthSlider();
+		UpdateManaSlider();
+	}
+	
 }

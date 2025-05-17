@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Responsible for saving local match result for the current player after the fight ends.
 /// </summary>
+[RequireComponent(typeof(NetworkObject))]
 public class GameManager : NetworkBehaviour
 {
     [Header("Match Outcome")]
@@ -26,6 +27,10 @@ public class GameManager : NetworkBehaviour
     /// </summary>
     public void FinalizeMatch(bool won, int kills, int deaths)
     {
+	    Debug.Log($"GameManagers FinalizeMatch() has been activated");
+	    
+	    Debug.Log($"[GameManager] IsServer = {IsServer}, IsClient = {IsClient}");
+	    
 	    if (matchEnded) return;
 	    matchEnded = true;
 
@@ -35,8 +40,9 @@ public class GameManager : NetworkBehaviour
 
 	    Debug.Log("[GameManager] Match stats saved:");
 	    Debug.Log(stats.ToString());
-
-	    StartCoroutine(EndMatchAfterDelay(2f));
+	    
+	    if (IsServer)
+			StartCoroutine(EndMatchAfterDelay(2f));
     }
 
     private IEnumerator EndMatchAfterDelay(float delay)
@@ -45,9 +51,34 @@ public class GameManager : NetworkBehaviour
 
 	    if (IsServer)
 	    {
-		    Debug.Log("[GameManager] Ending match. Returning to StartMenu for all players.");
-		    NetworkManager.Singleton.SceneManager.LoadScene("StartMenu", LoadSceneMode.Single);
+		    Debug.Log("[GameManager] RequestReturnToMenuClientRpc() is trying to be called inside EndMatchAfterDelay()");
+		    RequestReturnToMenuClientRpc();
 	    }
+    }
+    
+    /// <summary>
+    /// Server -> ALL clients (including itself):
+    /// shut networking down locally and reload the StartMenu scene.
+    /// </summary>
+    [ClientRpc]
+    public void RequestReturnToMenuClientRpc()
+    {
+	    Debug.Log("[GameManager] ReturnToMenuRoutine() trying to be called inside RequestReturnToMenuClientRpc()");
+	    StartCoroutine(ReturnToMenuRoutine());
+    }
+
+    private IEnumerator ReturnToMenuRoutine()
+    {
+	    Debug.Log("[GameManager] ReturnToMenuRoutine() is running");
+	    
+	    yield return new WaitForSeconds(0.25f); // let late RPCs finish
+
+	    // Clean up the transport on this machine
+	    if (NetworkManager.Singleton.IsListening)
+		    NetworkManager.Singleton.Shutdown();
+
+	    // Go back to the main menu locally and alone
+	    SceneManager.LoadScene("StartMenu", LoadSceneMode.Single);
     }
     
 }

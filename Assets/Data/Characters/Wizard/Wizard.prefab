@@ -324,15 +324,15 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   fighterName: Fighter
   baseAttackPower: 10
-  currentHealth: 0
+  currentHealth: 100
   maxHealth: 100
   healthSlider: {fileID: 0}
   manaSlider: {fileID: 0}
   maxMana: 100
   currentMana: 100
   manaRegenerationRate: 5
-  magicBoltPrefab: {fileID: 0}
-  firePoint: {fileID: 0}
+  magicBoltPrefab: {fileID: 5506060198856121997, guid: 88aad58662d65c84aad66114abf8ba7b, type: 3}
+  firePoint: {fileID: 6492106029954027857}
   projectileSpeed: 10
   projectileCooldown: 1
   meleeRange: 2.5
@@ -341,7 +341,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   attackPoint: {fileID: 2718835059480899194}
-  lightningBoltPrefab: {fileID: 0}
+  lightningBoltPrefab: {fileID: 8913347900330227479, guid: 7f26920a396babc4a9c595865db9345f, type: 3}
   lightningBoltSpeed: 15
   lightningBoltCooldown: 3
   lightningBoltCost: 30

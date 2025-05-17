@@ -53,25 +53,29 @@ public class LANBroadcastClient : MonoBehaviour
 
         while (isListening)
         {
-            try
-            {
-                byte[] data = udpListener.Receive(ref remoteEndPoint);
-                string message = Encoding.UTF8.GetString(data);
+	        try
+	        {
+		        byte[] data = udpListener.Receive(ref remoteEndPoint);
+		        string message = Encoding.UTF8.GetString(data);
 
-                if (message.StartsWith("FIGHTHOST:"))
-                {
-                    string hostIP = message.Substring(10);
-                    detectedHostIP = hostIP;
-                    Debug.Log($"[LANBroadcastClient] Host found at: {hostIP}");
+		        if (message.StartsWith("FIGHTHOST:"))
+		        {
+			        string hostIP = message.Substring(10);
+			        detectedHostIP = hostIP;
+			        Debug.Log($"[LANBroadcastClient] Host found at: {hostIP}");
 
-                    // Fire event for UI or auto-join
-                    OnHostFound?.Invoke(hostIP);
-                }
-            }
-            catch (SocketException ex)
-            {
-                Debug.LogWarning($"[LANBroadcastClient] Socket exception: {ex.Message}");
-            }
+			        // Fire event for UI or auto-join
+			        OnHostFound?.Invoke(hostIP);
+		        }
+	        }
+	        catch (SocketException ex)
+	        {
+		        Debug.LogWarning($"[LANBroadcastClient] Socket exception: {ex.Message}");
+	        }
+	        catch (System.Exception)
+	        {
+		        // swallow ThreadAbort or others on shutdown
+	        }
         }
     }
 
@@ -85,7 +89,7 @@ public class LANBroadcastClient : MonoBehaviour
         }
         if (listenThread != null && listenThread.IsAlive)
         {
-            listenThread.Abort();
+	        listenThread.Join(200);   // wait 0.2s then drop the reference
             listenThread = null; // Important: Null the thread reference
         }
     }

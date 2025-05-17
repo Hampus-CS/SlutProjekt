@@ -48,12 +48,20 @@ public class Warrior : FighterBase
 
     public override void Attack(FighterBase opponent)
     {
+	    // Block if stunned
         if (statusEffectManager != null && statusEffectManager.IsStunned())
         {
             Debug.Log($"{fighterName} is stunned and cannot attack!");
             return;
         }
 
+		// If no direct opponent passed (local click) -> use normal melee detection
+		if (opponent == null) {
+			MeleeAttack();
+			return;
+		}
+        
+		// Otherwise we’re on a remote call with a valid reference
         PlayAttackAnimation();
 
         int damage = baseAttackPower + 5;
