@@ -455,7 +455,7 @@ public abstract class FighterBase : NetworkBehaviour
 		}
 
 		// Now apply
-		ApplyDamage(amount, attacker);
+		victim.ApplyDamage(amount, attacker);
 	}
 	
 	[ServerRpc(RequireOwnership = false)]
