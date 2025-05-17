@@ -38,7 +38,7 @@ public abstract class FighterBase : NetworkBehaviour
 	private float lastProjectileTime = -Mathf.Infinity;
 
 	[Header("Melee Attack")]
-	public float meleeRange = 1.5f;
+	public float meleeRange = 0.5f;
 	public int meleeDamage = 10;
 	public LayerMask enemyLayers;
 	public Transform attackPoint;
@@ -172,25 +172,32 @@ public abstract class FighterBase : NetworkBehaviour
 			return;
 		}
 
+		Vector2 attackDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+		Vector2 boxCenter = (Vector2)attackPoint.position + attackDirection * (meleeRange / 2f);
+		Vector2 boxSize = new(meleeRange, 2f);
+
 		// Detect enemies within melee range
-		Collider2D[] enemiesHit = Physics2D.OverlapCircleAll(attackPoint.position, meleeRange, enemyLayers);
+		Collider2D[] enemiesHit = Physics2D.OverlapBoxAll(boxCenter, boxSize, enemyLayers);
 
 		foreach (var enemy in enemiesHit)
 		{
+			if (enemy.gameObject == this.gameObject) continue;
+
 			FighterBase enemyFighter = enemy.GetComponent<FighterBase>();
 			if (enemyFighter != null)
 			{
 				Debug.Log($"{gameObject.name} hits {enemyFighter.fighterName} with melee attack!");
+				enemyFighter.TakeDamage(meleeDamage, this);
+
 				if (enemyFighter.currentHealth == 0)
 				{
 					var net = GetComponent<NetworkObject>();
 				}
-
-				enemyFighter.TakeDamage(meleeDamage, this);
 			}
 		}
 
 		PlayAttackAnimation();
+		lastMeleeTime = Time.time;
 	}
 
 	private void Die()
@@ -331,7 +338,12 @@ public abstract class FighterBase : NetworkBehaviour
 		if (attackPoint == null) return;
 
 		Gizmos.color = Color.red;
-		Gizmos.DrawWireSphere(attackPoint.position, meleeRange);
+
+		Vector2 attackDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+		Vector2 boxCenter = (Vector2)attackPoint.position + attackDirection * (meleeRange / 2f);
+		Vector2 boxSize = new(meleeRange, 2f);
+
+		Gizmos.DrawWireCube(boxCenter, boxSize);
 	}
 
 	private void OnValidate()
