@@ -24,7 +24,7 @@ public class LightningBolt : MonoBehaviour
 			if (target == attacker)
 				return;
 
-			target.TakeDamage(impactDamage, attacker);
+			attacker.DealDamageServerRpc(target.NetworkObject, attacker.NetworkObject, impactDamage);
 			target.ApplyStun(stunDuration);
 			Destroy(gameObject);
 		}

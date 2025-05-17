@@ -70,7 +70,7 @@ public class Warrior : FighterBase
 			Debug.Log($"{fighterName} lands a crit!");
 		}
 
-		opponent.TakeDamage(damage, this);
+		DealDamageServerRpc(opponent.NetworkObject,this.NetworkObject, damage);
 		Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
 	}
 }

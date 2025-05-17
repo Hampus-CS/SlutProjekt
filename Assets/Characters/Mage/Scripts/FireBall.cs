@@ -24,9 +24,9 @@ public class Fireball : MonoBehaviour
 		{
 			if (target == attacker)
 				return;
-
-			target.TakeDamage(impactDamage, attacker);
-			target.ApplyBurn(totalBurnDamage, burnDuration);
+			
+			attacker.DealDamageServerRpc(target.NetworkObject, attacker.NetworkObject, impactDamage);
+			attacker.ApplyBurnServerRpc(target.NetworkObject, totalBurnDamage, burnDuration);
 			Destroy(gameObject);
 		}
 	}

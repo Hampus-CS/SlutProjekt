@@ -123,7 +123,7 @@ public class Samurai : FighterBase
 					if (opponent != null && opponent != this)
 					{
 						hasDashedHit = true;
-						opponent.TakeDamage(dashDamage, this);
+						DealDamageServerRpc(opponent.NetworkObject,this.NetworkObject, dashDamage);
 
 						Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
 						if (opponentRb != null)
@@ -173,7 +173,7 @@ public class Samurai : FighterBase
 		int damage = baseAttackPower + 5;
 		PlayAttackAnimation();
 		MeleeAttack();
-		opponent.TakeDamage(damage, this);
+		DealDamageServerRpc(opponent.NetworkObject,this.NetworkObject, meleeDamage);
 		Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
 	}
 }

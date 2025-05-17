@@ -19,7 +19,7 @@ public class MagicBolt : MonoBehaviour
 			if (target == attacker)
 				return;
 
-			target.TakeDamage(damage, attacker);
+			attacker.DealDamageServerRpc(target.NetworkObject, attacker.NetworkObject, damage);
 			Destroy(gameObject);
 		}
 	}
