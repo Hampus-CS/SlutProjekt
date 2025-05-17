@@ -7,201 +7,203 @@ using Unity.VisualScripting;
 [RequireComponent(typeof(SpriteRenderer))]
 public class PlayerMove : NetworkBehaviour
 {
-    [Header("Movement Settings")]
-    public float moveSpeed = 5f;
-    public float acceleration = 60f;
-    public float deceleration = 40f;
-    public float velocityPower = 0.95f;
-    public float jumpForce = 8f;
-    public float dashSpeed = 12f;
-    public float dashDuration = 0.2f;
-    public float stopThreshold = 0.05f;
+	[Header("Movement Settings")]
+	public float moveSpeed = 5f;
+	public float acceleration = 60f;
+	public float deceleration = 40f;
+	public float velocityPower = 0.95f;
+	public float jumpForce = 8f;
+	public float dashSpeed = 12f;
+	public float dashDuration = 0.2f;
+	public float stopThreshold = 0.05f;
 
-    [Header("Ground Check")]
-    public LayerMask groundLayer;
-    public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
+	[Header("Ground Check")]
+	public LayerMask groundLayer;
+	public Transform groundCheck;
+	public float groundCheckRadius = 0.2f;
 
-    private Rigidbody2D rb;
-    private bool isGrounded;
-    private bool isDashing;
-    private float dashTimer;
+	private Rigidbody2D rb;
+	private bool isGrounded;
+	private bool isDashing;
+	private float dashTimer;
 
-    public bool isMovementBlocked;
+	public bool isMovementBlocked;
 
-    private Vector2 moveDirection = Vector2.zero;
-    private SpriteRenderer spriteRenderer;
+	private GameManager gameManager;
 
-    private Animator animator;
-    
-    private NetworkVariable<bool> isFacingRight = new NetworkVariable<bool>(true,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
+	private Vector2 moveDirection = Vector2.zero;
+	private SpriteRenderer spriteRenderer;
 
-    public override void OnNetworkSpawn()
-    {
-	    isFacingRight.OnValueChanged += OnFacingChanged;
-	    OnFacingChanged(!isFacingRight.Value, isFacingRight.Value);
-    }
+	private Animator animator;
 
-    private void OnFacingChanged(bool oldValue, bool newValue)
-    {
-	    Vector3 scale = transform.localScale;
-	    scale.x = Mathf.Abs(scale.x) * (newValue ? 1 : -1);
-	    transform.localScale = scale;
-    }
-    
-    private void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
-    }
+	private NetworkVariable<bool> isFacingRight = new NetworkVariable<bool>(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    private void Update()
-    {
-        if (!IsOwner) return; // Prevent non-owners from moving
-        if (isDashing) return;
-        if (isMovementBlocked) return;
+	public override void OnNetworkSpawn()
+	{
+		isFacingRight.OnValueChanged += OnFacingChanged;
+		OnFacingChanged(!isFacingRight.Value, isFacingRight.Value);
+	}
 
-        // Handling a movement direction
-        bool movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-        bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
-        
-        //  Update animation for movement
-        bool isMoving = moveDirection != Vector2.zero;
-        animator.SetBool("isMoving", isMoving);
+	private void OnFacingChanged(bool oldValue, bool newValue)
+	{
+		Vector3 scale = transform.localScale;
+		scale.x = Mathf.Abs(scale.x) * (newValue ? 1 : -1);
+		transform.localScale = scale;
+	}
 
-        if (isMoving)
-        {
-	        bool faceRight = moveDirection.x > 0;
-	        if (isFacingRight.Value != faceRight)
-	        {
-		        isFacingRight.Value = faceRight;
-	        }
-	        
-        }
-        
-        
-        if (movingLeft)
-        {
-            moveDirection = Vector2.left;
-        }
-        else if (movingRight)
-        {
-            moveDirection = Vector2.right;
-        }
-        else if (movingLeft && movingRight)
-        {
-            moveDirection = Vector2.zero; // Stop if both keys are pressed
-        }
-        else
-        {
-            moveDirection = Vector2.zero; // No movement if neither is pressed
-        }
+	private void Start()
+	{
+		rb = GetComponent<Rigidbody2D>();
+		spriteRenderer = GetComponent<SpriteRenderer>();
+		animator = GetComponent<Animator>();
+		gameManager = FindObjectOfType<GameManager>();
+	}
 
+	private void Update()
+	{
+		if (gameManager.matchEnded) return;
+		if (!IsOwner) return; // Prevent non-owners from moving
+		if (isDashing) return;
+		if (isMovementBlocked) return;
 
-        // Jump (only if grounded)
-        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }
+		// Handling a movement direction
+		bool movingLeft = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+		bool movingRight = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
 
-        // Dash (only if there is a movement direction)
-        if (Input.GetKeyDown(KeyCode.LeftShift) && moveDirection != Vector2.zero)
-        {
-            StartDash();
-        }
+		//  Update animation for movement
+		bool isMoving = moveDirection != Vector2.zero;
+		animator.SetBool("isMoving", isMoving);
 
-        // Flip player based on a movement direction
-        if (movingLeft)
-        {
-            FlipPlayer(true);
-        }
-        else if (movingRight)
-        {
-            FlipPlayer(false);
-        }
-    }
+		if (isMoving)
+		{
+			bool faceRight = moveDirection.x > 0;
+			if (isFacingRight.Value != faceRight)
+			{
+				isFacingRight.Value = faceRight;
+			}
+		}
 
-    private void FixedUpdate()
-    {
-        // if (!IsOwner) return; // Prevent non-owners from moving
-        if (isMovementBlocked) return;
+		if (movingLeft)
+		{
+			moveDirection = Vector2.left;
+		}
+		else if (movingRight)
+		{
+			moveDirection = Vector2.right;
+		}
+		else if (movingLeft && movingRight)
+		{
+			moveDirection = Vector2.zero; // Stop if both keys are pressed
+		}
+		else
+		{
+			moveDirection = Vector2.zero; // No movement if neither is pressed
+		}
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+		// Jump (only if grounded)
+		if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isGrounded)
+		{
+			rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+		}
 
-        if (isDashing)
-        {
-            HandleDash();
-            return;
-        }
+		// Dash (only if there is a movement direction)
+		if (Input.GetKeyDown(KeyCode.LeftShift) && moveDirection != Vector2.zero)
+		{
+			StartDash();
+		}
 
-        HandleMovement();
-    }
+		// Flip player based on a movement direction
+		if (movingLeft)
+		{
+			FlipPlayer(true);
+		}
+		else if (movingRight)
+		{
+			FlipPlayer(false);
+		}
+	}
 
-    public void BlockMovement(bool isMovementBlocked)
-    {
-        if (isMovementBlocked)
-        {
-            rb.linearVelocity = Vector2.zero;
-        }
-    }
+	private void FixedUpdate()
+	{
+		if (!IsOwner) return; // Prevent non-owners from moving
+		if (gameManager.matchEnded) return;
+		if (isMovementBlocked) return;
 
-    private void HandleMovement()
-    {
-        float targetSpeed = moveDirection.x * moveSpeed;
-        float speedDiff = targetSpeed - rb.linearVelocity.x;
+		isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        float accelRate = moveDirection != Vector2.zero ? acceleration : deceleration;
+		if (isDashing)
+		{
+			HandleDash();
+			return;
+		}
 
-        float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
+		HandleMovement();
+	}
 
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y);
+	public void BlockMovement(bool isMovementBlocked)
+	{
+		if (isMovementBlocked)
+		{
+			rb.linearVelocity = Vector2.zero;
+		}
+	}
 
-        if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero)
-        {
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-        }
-    }
+	private void HandleMovement()
+	{
+		float targetSpeed = moveDirection.x * moveSpeed;
+		float speedDiff = targetSpeed - rb.linearVelocity.x;
 
-    private void StartDash()
-    {
-        isDashing = true;
-        dashTimer = dashDuration;
+		float accelRate = moveDirection != Vector2.zero ? acceleration : deceleration;
 
-        rb.linearVelocity = new Vector2(moveDirection.x * dashSpeed, 0f);
-    }
+		float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velocityPower) * Mathf.Sign(speedDiff);
 
-    private void HandleDash()
-    {
-        dashTimer -= Time.fixedDeltaTime;
-        if (dashTimer <= 0f)
-        {
-            isDashing = false;
-        }
-    }
+		rb.linearVelocity = new Vector2(rb.linearVelocity.x + movement * Time.fixedDeltaTime, rb.linearVelocity.y);
 
-    private void FlipPlayer(bool flipLeft)
-    {
-        Vector3 scale = transform.localScale;
+		if (Mathf.Abs(rb.linearVelocity.x) < stopThreshold && moveDirection == Vector2.zero)
+		{
+			rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+		}
+	}
 
-        if (flipLeft)
-        {
-            scale.x = -Mathf.Abs(scale.x); // Flip to the left
-        }
-        else
-        {
-            scale.x = Mathf.Abs(scale.x); // Flip to the right
-        }
+	private void StartDash()
+	{
+		isDashing = true;
+		dashTimer = dashDuration;
 
-        transform.localScale = scale;
-    }
+		rb.linearVelocity = new Vector2(moveDirection.x * dashSpeed, 0f);
+	}
 
-    private void OnDrawGizmosSelected()
-    {
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        }
-    }
+	private void HandleDash()
+	{
+		dashTimer -= Time.fixedDeltaTime;
+		if (dashTimer <= 0f)
+		{
+			isDashing = false;
+		}
+	}
+
+	private void FlipPlayer(bool flipLeft)
+	{
+		Vector3 scale = transform.localScale;
+
+		if (flipLeft)
+		{
+			scale.x = -Mathf.Abs(scale.x); // Flip to the left
+		}
+		else
+		{
+			scale.x = Mathf.Abs(scale.x); // Flip to the right
+		}
+
+		transform.localScale = scale;
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		if (groundCheck != null)
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+		}
+	}
 }

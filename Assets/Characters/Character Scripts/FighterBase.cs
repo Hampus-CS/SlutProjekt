@@ -145,15 +145,14 @@ public abstract class FighterBase : NetworkBehaviour
 		Debug.Log("Shoot");
 		if (magicBoltPrefab != null && firePoint != null)
 		{
-
 			GameObject bolt = Instantiate(magicBoltPrefab, firePoint.position, Quaternion.Euler(0, 0, 90));
-			
+
 			var mb = bolt.GetComponent<MagicBolt>();
 			if (mb != null)
 				mb.attacker = this;
 
 			var rb = bolt.GetComponent<Rigidbody2D>();
-			
+
 			if (rb != null)
 			{
 				float direction = transform.localScale.x < 0 ? -1f : 1f;
@@ -198,9 +197,8 @@ public abstract class FighterBase : NetworkBehaviour
 				{
 					var net = GetComponent<NetworkObject>();
 				}
-				
-				DealDamageServerRpc(enemyFighter.NetworkObject, this.NetworkObject, meleeDamage);
 
+				DealDamageServerRpc(enemyFighter.NetworkObject, this.NetworkObject, meleeDamage);
 			}
 		}
 
@@ -399,7 +397,7 @@ public abstract class FighterBase : NetworkBehaviour
 		Debug.Log("NotifyOpponentWonClientRpc has been called, will now call FinalizeLocalMatch()");
 
 		// Only the surviving player’s owner should run this
-		if (!IsOwner) return;
+		// if (!IsOwner) return;
 
 		bool iWon = true;
 		int myKills = sessionKills;
@@ -424,7 +422,7 @@ public abstract class FighterBase : NetworkBehaviour
 		UpdateHealthSlider();
 		UpdateManaSlider();
 	}
-	
+
 	[ServerRpc(RequireOwnership = false)]
 	public void DealDamageServerRpc(NetworkObjectReference victimRef, NetworkObjectReference attackerRef, int amount)
 	{
@@ -434,6 +432,7 @@ public abstract class FighterBase : NetworkBehaviour
 			Debug.LogError($"DealDamageServerRpc: couldn't resolve victim {victimRef}");
 			return;
 		}
+
 		var victim = vicObj.GetComponent<FighterBase>();
 		if (victim == null)
 		{
@@ -447,6 +446,7 @@ public abstract class FighterBase : NetworkBehaviour
 			Debug.LogError($"DealDamageServerRpc: couldn't resolve attacker {attackerRef}");
 			return;
 		}
+
 		var attacker = atkObj.GetComponent<FighterBase>();
 		if (attacker == null)
 		{
@@ -457,7 +457,7 @@ public abstract class FighterBase : NetworkBehaviour
 		// Now apply
 		victim.ApplyDamage(amount, attacker);
 	}
-	
+
 	[ServerRpc(RequireOwnership = false)]
 	public void ApplyBurnServerRpc(NetworkObjectReference victimRef, int totalDamage, float duration)
 	{
@@ -465,7 +465,6 @@ public abstract class FighterBase : NetworkBehaviour
 		var victim = victimObj.GetComponent<FighterBase>();
 		victim.ApplyBurn(totalDamage, duration);
 	}
-
 
 // Separate from the public RPC-able version
 	private void ApplyDamage(int amount, FighterBase attacker)
@@ -496,15 +495,13 @@ public abstract class FighterBase : NetworkBehaviour
 
 			// NEW: if the slider just hit zero, finish the death routine locally
 			if (currentHealth <= 0 && !isDead)
-				Die();          // ← this time IsOwner == true, so FinalizeLocalMatch() runs
+				Die(); // ← this time IsOwner == true, so FinalizeLocalMatch() runs
 		}
 	}
-	
+
 	[ClientRpc]
 	private void AddKillClientRpc(ClientRpcParams p = default)
 	{
 		FighterBase.sessionKills++;
 	}
-
-	
 }

@@ -55,14 +55,14 @@ public class Warrior : FighterBase
 		// If no direct opponent passed (local click) -> use normal melee detection
 		if (opponent == null)
 		{
+			PlayAttackAnimation();
 			MeleeAttack();
 			return;
 		}
 
 		// Otherwise we’re on a remote call with a valid reference
-		PlayAttackAnimation();
-
 		int damage = baseAttackPower + 5;
+
 		if (isCritActive)
 		{
 			damage *= critDamageMultiplier;
@@ -70,7 +70,7 @@ public class Warrior : FighterBase
 			Debug.Log($"{fighterName} lands a crit!");
 		}
 
-		DealDamageServerRpc(opponent.NetworkObject,this.NetworkObject, damage);
+		DealDamageServerRpc(opponent.NetworkObject, this.NetworkObject, damage);
 		Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
 	}
 }

@@ -123,7 +123,7 @@ public class Samurai : FighterBase
 					if (opponent != null && opponent != this)
 					{
 						hasDashedHit = true;
-						DealDamageServerRpc(opponent.NetworkObject,this.NetworkObject, dashDamage);
+						DealDamageServerRpc(opponent.NetworkObject, this.NetworkObject, dashDamage);
 
 						Rigidbody2D opponentRb = opponent.GetComponent<Rigidbody2D>();
 						if (opponentRb != null)
@@ -167,13 +167,21 @@ public class Samurai : FighterBase
 
 	public override void Attack(FighterBase opponent)
 	{
+		// Block if stunned
 		if (isDead) return;
-		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
+		if (statusEffectManager.IsStunned()) return;
 
-		int damage = baseAttackPower + 5;
+		// If no direct opponent passed (local click) -> use normal melee detection
+		if (opponent == null)
+		{
+			MeleeAttack();
+			return;
+		}
+
 		PlayAttackAnimation();
-		MeleeAttack();
-		DealDamageServerRpc(opponent.NetworkObject,this.NetworkObject, meleeDamage);
+		int damage = baseAttackPower + 5;
+
+		DealDamageServerRpc(opponent.NetworkObject, this.NetworkObject, damage);
 		Debug.Log($"{fighterName} attacks {opponent.fighterName} for {damage} damage!");
 	}
 }
