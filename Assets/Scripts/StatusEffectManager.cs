@@ -128,7 +128,7 @@ public class StatusEffectManager : MonoBehaviour
 			if (spriteRenderer != null)
 			{
 				float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f;
-				Color burnColor = new Color(1f, 0f, 0f, 0.7f * pulse);
+				Color burnColor = new(1f, 0f, 0f, 0.9f * pulse);
 				spriteRenderer.color = Color.Lerp(originalColor, burnColor, pulse);
 			}
 		}

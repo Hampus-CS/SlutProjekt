@@ -47,6 +47,8 @@ public abstract class FighterBase : NetworkBehaviour
 	public static int sessionKills = 0;
 	public static int sessionDeaths = 0;
 
+	protected bool isDead = false;
+
 	public SpriteRenderer SpriteRenderer => GetComponent<SpriteRenderer>();
 	public PlayerMove PlayerMove => GetComponent<PlayerMove>();
 
@@ -98,6 +100,8 @@ public abstract class FighterBase : NetworkBehaviour
 
 	public void TakeDamage(int amount, FighterBase attacker)
 	{
+		if (isDead) return;
+
 		PlayDamageAnimation();
 		currentHealth -= amount;
 		currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -188,6 +192,9 @@ public abstract class FighterBase : NetworkBehaviour
 	{
 		Debug.Log($"{fighterName} has died.");
 
+		isDead = true;
+		GetComponent<PlayerMove>()?.BlockMovement(true);
+
 		if (animator != null)
 		{
 			animator.SetBool("isDead", true);
@@ -210,9 +217,9 @@ public abstract class FighterBase : NetworkBehaviour
 		bool iWon = false;
 		int myKills = sessionKills;
 		int myDeaths = sessionDeaths + 1;
-		
+
 		Debug.Log("Die() has been called and now will attempt to FinalizeLocalMatch()");
-		
+
 		FinalizeLocalMatch(iWon, myKills, myDeaths);
 
 		// 2) Tell the opponent to record “I won” on THEIR profile
@@ -228,7 +235,6 @@ public abstract class FighterBase : NetworkBehaviour
 			// Client dying → asks the host to relay that RPC
 			SubmitOpponentWonServerRpc();
 		}
-		
 	}
 
 	private void UpdateHealthSlider()
@@ -337,7 +343,7 @@ public abstract class FighterBase : NetworkBehaviour
 	/// </summary>
 	private void FinalizeLocalMatch(bool won, int kills, int deaths)
 	{
-		Debug.Log("FinalizeLocalMatch in FighterBase is triggerd");
+		Debug.Log("FinalizeLocalMatch in FighterBase is triggered");
 		var gm = FindObjectOfType<GameManager>();
 		if (gm == null)
 			Debug.Log("gm is null");
@@ -362,7 +368,7 @@ public abstract class FighterBase : NetworkBehaviour
 	private void NotifyOpponentWonClientRpc(ClientRpcParams rpcParams = default)
 	{
 		Debug.Log("NotifyOpponentWonClientRpc has been called, will now call FinalizeLocalMatch()");
-		
+
 		// Only the surviving player’s owner should run this
 		if (IsOwner) return;
 
@@ -371,7 +377,7 @@ public abstract class FighterBase : NetworkBehaviour
 		int myDeaths = sessionDeaths;
 		FinalizeLocalMatch(iWon, myKills, myDeaths);
 	}
-	
+
 	public override void OnNetworkSpawn()
 	{
 		base.OnNetworkSpawn();
@@ -384,10 +390,9 @@ public abstract class FighterBase : NetworkBehaviour
 		yield return new WaitUntil(() => HUDManager.Instance && HUDManager.Instance.HealthSlider && HUDManager.Instance.ManaSlider);
 
 		healthSlider = HUDManager.Instance.HealthSlider;
-		manaSlider   = HUDManager.Instance.ManaSlider;
+		manaSlider = HUDManager.Instance.ManaSlider;
 
 		UpdateHealthSlider();
 		UpdateManaSlider();
 	}
-	
 }

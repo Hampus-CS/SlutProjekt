@@ -12,7 +12,7 @@ public class Mage : FighterBase
 	void Update()
 	{
 		if (!IsOwner) return;
-
+		if (isDead) return;
 		if (statusEffectManager.IsStunned()) return;
 
 		if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastFireballTime + fireballCooldown)
@@ -40,8 +40,8 @@ public class Mage : FighterBase
 		if (fireballPrefab != null && firePoint != null)
 		{
 			GameObject fireball = Instantiate(fireballPrefab, firePoint.position, Quaternion.identity);
-
 			Fireball fireballScript = fireball.GetComponent<Fireball>();
+
 			if (fireballScript != null)
 			{
 				fireballScript.attacker = this;
@@ -65,11 +65,8 @@ public class Mage : FighterBase
 	public override void Attack(FighterBase opponent)
 	{
 		Debug.Log($"{fighterName} attacks!");
-		if (statusEffectManager != null && statusEffectManager.IsStunned())
-		{
-			Debug.Log($"{fighterName} is stunned and cannot attack!");
-			return;
-		}
+		if (isDead) return;
+		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
 
 		PlayAttackAnimation();
 		Debug.Log($"{fighterName} attacks!");

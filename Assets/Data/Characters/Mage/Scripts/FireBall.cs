@@ -6,7 +6,8 @@ public class Fireball : MonoBehaviour
 	private int totalBurnDamage = 10;
 	private float burnDuration = 5f;
 
-	public Animator animator;
+	[SerializeField]
+	private Animator animator;
 
 	public FighterBase attacker;
 

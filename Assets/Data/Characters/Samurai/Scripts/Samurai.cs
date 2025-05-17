@@ -54,6 +54,10 @@ public class Samurai : FighterBase
 
 	private void Update()
 	{
+		if (!IsOwner) return;
+		if (isDead) return;
+		if (statusEffectManager.IsStunned()) return;
+
 		if (Input.GetKeyDown(KeyCode.Space) && !isPerformingAbility && Time.time - lastDashTime > dashDuration)
 		{
 			StartDashPierce();
@@ -163,11 +167,8 @@ public class Samurai : FighterBase
 
 	public override void Attack(FighterBase opponent)
 	{
-		if (statusEffectManager != null && statusEffectManager.IsStunned())
-		{
-			Debug.Log($"{fighterName} is stunned and cannot attack!");
-			return;
-		}
+		if (isDead) return;
+		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
 
 		int damage = baseAttackPower + 5;
 		PlayAttackAnimation();
