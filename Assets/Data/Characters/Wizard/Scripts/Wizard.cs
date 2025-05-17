@@ -11,11 +11,16 @@ public class Wizard : FighterBase
 	public int lightningBoltCost = 30;
 	private float lastLightningBoltTime = -Mathf.Infinity;
 
+	private void Start()
+	{
+		statusEffectManager = GetComponent<StatusEffectManager>();
+	}
+
 	private void Update()
 	{
 		if (!IsOwner) return;
 		if (isDead) return;
-		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
+		if (statusEffectManager.IsStunned()) return;
 
 		// Lightning bolt cooldown and mana check
 		if (Input.GetKeyDown(KeyCode.Space) && Time.time >= lastLightningBoltTime + lightningBoltCooldown)
@@ -75,7 +80,7 @@ public class Wizard : FighterBase
 	{
 		Debug.Log($"{fighterName} attacks!");
 		if (isDead) return;
-		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
+		if (statusEffectManager.IsStunned()) return;
 
 		PlayAttackAnimation();
 		Debug.Log($"{fighterName} attacks!");

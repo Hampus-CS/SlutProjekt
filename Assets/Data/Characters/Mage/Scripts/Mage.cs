@@ -9,6 +9,11 @@ public class Mage : FighterBase
 	public int fireballCost = 20;
 	private float lastFireballTime = -Mathf.Infinity;
 
+	private void Start()
+	{
+		statusEffectManager = GetComponent<StatusEffectManager>();
+	}
+	
 	void Update()
 	{
 		if (!IsOwner) return;
@@ -66,7 +71,7 @@ public class Mage : FighterBase
 	{
 		Debug.Log($"{fighterName} attacks!");
 		if (isDead) return;
-		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
+		if (statusEffectManager.IsStunned()) return;
 
 		PlayAttackAnimation();
 		Debug.Log($"{fighterName} attacks!");

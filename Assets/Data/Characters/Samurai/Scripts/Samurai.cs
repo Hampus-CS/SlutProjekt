@@ -38,6 +38,7 @@ public class Samurai : FighterBase
 		rb = GetComponent<Rigidbody2D>();
 		rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 		animator = GetComponent<Animator>();
+		statusEffectManager = GetComponent<StatusEffectManager>();
 
 		// Assign colliders
 		leftWallCollider = GameObject.Find("LeftWall")?.GetComponent<BoxCollider2D>();

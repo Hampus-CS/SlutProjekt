@@ -12,6 +12,11 @@ public class Warrior : FighterBase
 	private float lastCritTime = -Mathf.Infinity;
 	private float critCooldown = 5f;
 
+	private void Start()
+	{
+		statusEffectManager = GetComponent<StatusEffectManager>();
+	}
+
 	private void Update()
 	{
 		if (!IsOwner) return;
@@ -50,7 +55,7 @@ public class Warrior : FighterBase
 	{
 		// Block if stunned
 		if (isDead) return;
-		if (statusEffectManager == null || statusEffectManager.IsStunned()) return;
+		if (statusEffectManager.IsStunned()) return;
 
 		// If no direct opponent passed (local click) -> use normal melee detection
 		if (opponent == null)

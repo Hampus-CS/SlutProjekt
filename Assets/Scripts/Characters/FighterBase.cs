@@ -15,6 +15,7 @@ public abstract class FighterBase : NetworkBehaviour
 	[Header("Base Stats")]
 	public string fighterName = "Fighter";
 	public int baseAttackPower = 10;
+	[Range(0, 100)]
 	public int currentHealth;
 	public int maxHealth = 100;
 
@@ -25,6 +26,7 @@ public abstract class FighterBase : NetworkBehaviour
 
 	[Header("Mana System")]
 	public float maxMana = 100f;
+	[Range(0, 100)]
 	public float currentMana = 100f;
 	public float manaRegenerationRate = 5f;
 
@@ -243,21 +245,21 @@ public abstract class FighterBase : NetworkBehaviour
 	{
 		if (!IsOwner || healthSlider == null)
 			return;
-		
-		if(healthSlider != null)
+
+		if (healthSlider != null)
 		{
 			healthSlider.maxValue = maxHealth;
 			healthSlider.value = currentHealth;
 		}
 		else
-			Debug.LogWarning("hpSlider is not assigned on " + gameObject.name);	
+			Debug.LogWarning("hpSlider is not assigned on " + gameObject.name);
 	}
 
 	private void UpdateManaSlider()
 	{
 		if (!IsOwner || manaSlider == null)
 			return;
-		
+
 		if (manaSlider != null)
 		{
 			manaSlider.maxValue = maxMana;
