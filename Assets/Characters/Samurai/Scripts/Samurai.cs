@@ -34,11 +34,10 @@ public class Samurai : FighterBase
 
 	private void Start()
 	{
+		base.Start();
 		ghostSpawner = GetComponent<GhostSpawner>();
 		rb = GetComponent<Rigidbody2D>();
 		rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-		animator = GetComponent<Animator>();
-		statusEffectManager = GetComponent<StatusEffectManager>();
 
 		// Assign colliders
 		leftWallCollider = GameObject.Find("LeftWall")?.GetComponent<BoxCollider2D>();

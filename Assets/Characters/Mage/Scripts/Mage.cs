@@ -9,11 +9,6 @@ public class Mage : FighterBase
 	public int fireballCost = 20;
 	private float lastFireballTime = -Mathf.Infinity;
 
-	private void Start()
-	{
-		statusEffectManager = GetComponent<StatusEffectManager>();
-	}
-	
 	void Update()
 	{
 		if (!IsOwner) return;

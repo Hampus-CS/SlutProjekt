@@ -12,11 +12,6 @@ public class Warrior : FighterBase
 	private float lastCritTime = -Mathf.Infinity;
 	private float critCooldown = 5f;
 
-	private void Start()
-	{
-		statusEffectManager = GetComponent<StatusEffectManager>();
-	}
-
 	private void Update()
 	{
 		if (!IsOwner) return;

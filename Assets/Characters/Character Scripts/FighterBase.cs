@@ -57,7 +57,7 @@ public abstract class FighterBase : NetworkBehaviour
 	protected Animator animator;
 	protected StatusEffectManager statusEffectManager;
 
-	private void Start()
+	protected void Start()
 	{
 		var netObj = GetComponent<NetworkObject>();
 		if (netObj != null && netObj.IsOwner)
@@ -68,6 +68,7 @@ public abstract class FighterBase : NetworkBehaviour
 
 		if (IsOwner)
 			sliderUI = FindFirstObjectByType<Sliders>();
+
 		animator = GetComponent<Animator>();
 		statusEffectManager = GetComponent<StatusEffectManager>();
 
@@ -194,6 +195,8 @@ public abstract class FighterBase : NetworkBehaviour
 
 	private void Die()
 	{
+		if (isDead) return;
+
 		Debug.Log($"{fighterName} has died.");
 
 		isDead = true;
@@ -323,7 +326,7 @@ public abstract class FighterBase : NetworkBehaviour
 		animator.SetTrigger("DieTrigger");
 	}
 
-	private void OnDrawGizmosSelected()
+	private void OnDrawGizmos()
 	{
 		if (attackPoint == null) return;
 

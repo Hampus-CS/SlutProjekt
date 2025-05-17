@@ -11,11 +11,6 @@ public class Wizard : FighterBase
 	public int lightningBoltCost = 30;
 	private float lastLightningBoltTime = -Mathf.Infinity;
 
-	private void Start()
-	{
-		statusEffectManager = GetComponent<StatusEffectManager>();
-	}
-
 	private void Update()
 	{
 		if (!IsOwner) return;
