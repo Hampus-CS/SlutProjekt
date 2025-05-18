@@ -1,6 +1,8 @@
 # SlutProjekt
 **Hampus & Kalle SU23b**
 
+1080p is the required resolution to play!
+
 Welcome to our 2D LAN street fighting game test/demo! (Bugs can be expected, play at own risk)
 
 You can play with two instances on the same machine, or with two machines on the same local network.
